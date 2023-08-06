@@ -1,0 +1,94 @@
+<!DOCTYPE SpriteDecomposer>
+<sprites image="megamanmastersheet.gif" transparentColor="0">
+ <animation title="jump" delay="150">
+  <cut w="27" x="39" y="704" h="40" row="1" col="1"/>
+  <cut w="24" x="75" y="702" h="42" row="1" col="1"/>
+  <cut w="27" x="107" y="695" h="49" row="1" col="1"/>
+  <cut w="26" x="139" y="696" h="48" row="1" col="1"/>
+  <cut w="27" x="171" y="697" h="47" row="1" col="1"/>
+  <cut w="28" x="203" y="693" h="51" row="1" col="1"/>
+  <cut w="32" x="233" y="694" h="49" row="1" col="1"/>
+  <cut w="28" x="268" y="694" h="50" row="1" col="1"/>
+  <cut w="27" x="300" y="691" h="53" row="1" col="1"/>
+  <cut w="24" x="335" y="689" h="55" row="1" col="1"/>
+
+ </animation>
+ <animation title="hit" delay="150">
+  <cut w="42.25" x="6.75" y="464" h="47" row="1" col="1"/>
+  <cut w="44.5" x="53.5" y="462.25" h="52.75" row="1" col="1"/>
+  <cut w="47" x="104" y="462.75" h="50.25" row="1" col="1"/>
+  <cut w="39.5" x="162.5" y="462.5" h="52.5" row="1" col="1"/>
+  <cut w="36.25" x="207.75" y="462.5" h="48.5" row="1" col="1"/>
+  <cut w="28" x="252" y="464" h="44" row="1" col="1"/>
+  <cut w="28" x="285" y="464" h="44" row="1" col="1"/>
+  <cut w="31" x="317" y="464" h="44" row="1" col="1"/>
+  <cut w="31" x="349" y="464" h="44" row="1" col="1"/>
+  <cut w="31" x="381" y="464" h="44" row="1" col="1"/>
+  <cut w="30" x="414" y="463" h="45" row="1" col="1"/>
+ </animation>
+ <animation title="duck" delay="150">
+  <cut w="32" x="242" y="335" h="31" row="1" col="1"/>
+ </animation>
+ <animation title="shoot" delay="150">
+  <cut w="41" x="2" y="150" h="41" row="1" col="1"/>
+  <cut w="39" x="45" y="150" h="41" row="1" col="1"/>
+  <cut w="39" x="86" y="150" h="41" row="1" col="1"/>
+ </animation>
+ <animation title="shootAndWalk" delay="150">
+  <cut w="39" x="94" y="632" h="40" row="1" col="1"/>
+  <cut w="35" x="137" y="631" h="41" row="1" col="1"/>
+  <cut w="40" x="176" y="631" h="41" row="1" col="1"/>
+  <cut w="46" x="223" y="634" h="38" row="1" col="1"/>
+  <cut w="51" x="273" y="635" h="37" row="1" col="1"/>
+  <cut w="45" x="329" y="632" h="40" row="1" col="1"/>
+  <cut w="40" x="378" y="631" h="41" row="1" col="1"/>
+  <cut w="38" x="423" y="629" h="43" row="1" col="1"/>
+  <cut w="37" x="465" y="631" h="41" row="1" col="1"/>
+  <cut w="41" x="507" y="631" h="41" row="1" col="1"/>
+  <cut w="42" x="552" y="634" h="38" row="1" col="1"/>
+  <cut w="42" x="598" y="635" h="37" row="1" col="1"/>
+  <cut w="43" x="643" y="634" h="38" row="1" col="1"/>
+  <cut w="43" x="690" y="633" h="39" row="1" col="1"/>
+ </animation>
+ <animation title="climb" delay="150">
+  <cut w="21" x="122" y="387" h="58" row="1" col="1"/>
+  <cut w="25" x="146" y="389" h="51" row="1" col="1"/>
+
+  <cut w="30" x="211" y="388" h="53" row="1" col="1"/>
+  
+    <cut w="-21" x="143" y="387" h="58" row="1" col="1"/>
+  <cut w="-25" x="171" y="389" h="51" row="1" col="1"/>
+
+  <cut w="-30" x="241" y="388" h="53" row="1" col="1"/>
+ </animation>
+ <animation title="stay" delay="150">
+  <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="268" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="303" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="338" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="303" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="268" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
+  <cut w="32" x="233" y="93" h="41" row="1" col="1"/>
+ </animation>
+ <animation title="walk" delay="150">
+  <cut w="27" x="84" y="575" h="40" row="1" col="1"/>
+  <cut w="23" x="119" y="574" h="41" row="1" col="1"/>
+  <cut w="31" x="150" y="574" h="41" row="1" col="1"/>
+  <cut w="37" x="190" y="577" h="38" row="1" col="1"/>
+  <cut w="40" x="237" y="578" h="37" row="1" col="1"/>
+  <cut w="34" x="287" y="575" h="40" row="1" col="1"/>
+  <cut w="27" x="333" y="574" h="41" row="1" col="1"/>
+  <cut w="26" x="372" y="572" h="43" row="1" col="1"/>
+  <cut w="26" x="409" y="574" h="41" row="1" col="1"/>
+  <cut w="33" x="447" y="574" h="41" row="1" col="1"/>
+  <cut w="39" x="488" y="577" h="38" row="1" col="1"/>
+  <cut w="40" x="535" y="578" h="37" row="1" col="1"/>
+  <cut w="36" x="584" y="577" h="38" row="1" col="1"/>
+  <cut w="33" x="627" y="576" h="39" row="1" col="1"/>
+ </animation>
+</sprites>
