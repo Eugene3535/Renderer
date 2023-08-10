@@ -91,25 +91,25 @@ GLuint Shader::getHandle() const noexcept
     return m_handle;
 }
 
-void Shader::setUniform(GLint loc, const glm::vec2 &value) noexcept
+void Shader::setUniform(GLint loc, const glm::vec2& value) noexcept
 {
     if (loc != -1)
-        glUniform2fv(loc, 1, &value[0]);
+        glUniform2fv(loc, 1, glm::value_ptr(value));
 }
 
-void Shader::setUniform(GLint loc, const glm::vec3 &value) noexcept
+void Shader::setUniform(GLint loc, const glm::vec3& value) noexcept
 {
     if (loc != -1)
-        glUniform3fv(loc, 1, &value[0]);
+        glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
-void Shader::setUniform(GLint loc, const glm::vec4 &value) noexcept
+void Shader::setUniform(GLint loc, const glm::vec4& value) noexcept
 {
     if (loc != -1)
-        glUniform4fv(loc, 1, &value[0]);
+        glUniform4fv(loc, 1, glm::value_ptr(value));
 }
 
-void Shader::setUniform(GLint loc, const glm::mat4 &matrix) noexcept
+void Shader::setUniform(GLint loc, const glm::mat4& matrix) noexcept
 {
     if (loc != -1)
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));

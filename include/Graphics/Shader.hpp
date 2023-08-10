@@ -13,6 +13,10 @@ class Shader
 {
 public:
     Shader() noexcept;
+    Shader(const Shader& other) = delete;
+	Shader(const Shader&& other) = delete;
+	Shader& operator = (const Shader& other) = delete;
+	Shader& operator = (const Shader&& other) = delete;
     ~Shader();
     
     bool compile(const std::string& filename, GLenum type) noexcept;
