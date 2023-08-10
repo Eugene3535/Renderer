@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Shader.hpp"
+#include "Graphics/Shader.hpp"
 #include "Loaders/AssetLoader.hpp"
 #include "Loaders/TileMap.hpp"
 
@@ -10,6 +10,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <chrono>
+#include <thread>
+
+using Clock = std::chrono::high_resolution_clock;
+using TimeStamp = std::chrono::time_point<Clock>;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 bool IsKeyPressed(GLFWwindow* window, const int key);
@@ -33,7 +38,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -75,13 +80,25 @@ int main()
     glm::mat4 view(1.0f);
     view = glm::translate(view,glm::vec3(0, 0, 0) );
 
-    shader.setUniform("projection", projection);
-    shader.setUniform("view", view);
+    GLint projLoc = shader.getUniformLocation("projection");
+    GLint viewLoc = shader.getUniformLocation("view");
 
+    shader.setUniform(projLoc, projection);
+    shader.setUniform(viewLoc, view);
 
+    TimeStamp timestamp = Clock::now();
 
     while (!glfwWindowShouldClose(window))
     {
+        const auto dt = Clock::now() - timestamp;
+
+        if (dt < std::chrono::milliseconds(10)) 
+        { 
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
+        timestamp = Clock::now();
+
         glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -99,9 +116,9 @@ int main()
 
         shader.bind();
 
-        shader.setUniform("view", view);
+        shader.setUniform(viewLoc, view);
 
-        tm.draw(shader.m_handle);
+        tm.draw(shader.getHandle());
 
         glfwSwapBuffers(window);
         glfwPollEvents();      

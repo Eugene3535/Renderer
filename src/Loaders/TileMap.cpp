@@ -56,7 +56,7 @@ std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_nod
 		auto pTexName       = pTilesetNode->first_attribute("name");
 		std::string texName = pTexName ?  pTexName->value() : std::string();
 
-		const auto pTileset = AssetLoader::getTexture(texName);
+		auto pTileset = AssetLoader::getTexture(texName);
 
 		if( pTileset == nullptr )
 			continue;
@@ -191,10 +191,13 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 					GLuint X = tile_num % current_tileset->columns;
 					glm::vec2 tex_coords(X * tile_width, Y * tile_height);
 
-					float left   = tex_coords.x / pLayer->pTexture->width;
-					float top    = tex_coords.y / pLayer->pTexture->height;
-					float right  = (tex_coords.x + tile_width)  / pLayer->pTexture->width;
-					float bottom = (tex_coords.y + tile_height) / pLayer->pTexture->height;
+					int width = pLayer->pTexture->getSize().x;
+					int height = pLayer->pTexture->getSize().y;
+
+					float left   = tex_coords.x / width;
+					float top    = tex_coords.y / height;
+					float right  = (tex_coords.x + tile_width)  / width;
+					float bottom = (tex_coords.y + tile_height) / height;
 
 					GLuint index = static_cast<GLuint>(pLayer->vertices.size());
 
@@ -226,15 +229,15 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 			glBindVertexArray(layer.vao);
 
 			glBindBuffer(GL_ARRAY_BUFFER, layer.vbo);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * layer.vertices.size(), layer.vertices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * layer.vertices.size(), layer.vertices.data(), GL_STATIC_DRAW);
 
-			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
 			glEnableVertexAttribArray(0);
 
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, u));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, u));
 			glEnableVertexAttribArray(1);
 
-			glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, color));
+			glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, color));
 			glEnableVertexAttribArray(2);
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -253,7 +256,7 @@ void TileMap::draw(const GLuint shader) noexcept
 	for(auto& plane : m_tilePlanes)
 		for(auto& layer : plane.tileLayers)
 		{
-			glBindTexture(GL_TEXTURE_2D, layer.pTexture->id);
+			layer.pTexture->bind();
 			glBindVertexArray(layer.vao);
 			glDrawElements(GL_TRIANGLES, static_cast<GLuint>(layer.indices.size()), GL_UNSIGNED_INT, layer.indices.data());
 			glBindVertexArray(0);

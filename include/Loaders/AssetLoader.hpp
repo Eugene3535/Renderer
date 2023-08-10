@@ -6,13 +6,15 @@
 
 #include <glad/glad.h>
 
+#include "Graphics/Texture2D.hpp"
+
 class AssetLoader
 {
 public:
     AssetLoader() noexcept;
     ~AssetLoader();
 
-    static const struct Texture2D* getTexture(const std::string& filename) noexcept;
+    static class Texture2D* getTexture(const std::string& filename) noexcept;
 
 private:
     std::unordered_map<std::string, Texture2D> m_textures;

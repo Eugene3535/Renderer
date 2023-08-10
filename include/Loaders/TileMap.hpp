@@ -11,14 +11,14 @@
 
 #include "rapidxml.hpp"
 
-#include "Utils/Structures.hpp"
+#include "Graphics/Vertex2D.hpp"
 
 class TileMap
 {
 private:
 	struct TilesetData
 	{
-		const struct Texture2D* pTexture = nullptr;
+		class Texture2D* pTexture = nullptr;
 		GLuint columns   = 0;
 		GLuint rows      = 0;
 		GLuint tileCount = 0;
@@ -30,9 +30,9 @@ public:
 	{
 		struct TileLayer
 		{
-			std::vector<Vertex> vertices; 
+			std::vector<Vertex2D> vertices; 
 			std::vector<GLuint> indices;
-			const Texture2D* pTexture = nullptr;
+			class Texture2D* pTexture = nullptr;
 			GLuint vao = 0;
 			GLuint vbo = 0;
 		};

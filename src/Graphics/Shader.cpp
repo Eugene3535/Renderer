@@ -1,4 +1,4 @@
-#include "Shader.hpp"
+#include "Graphics/Shader.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -6,16 +6,21 @@
 #include <sstream>
 #include <iostream>
 
-Shader::Shader() noexcept : 
+Shader::Shader() noexcept: 
     m_handle(0)
 {
     m_handle = glCreateProgram();
+
+    setUniform1i = glUniform1i;
+    setUniform1f = glUniform1f;
+    setUniform2f = glUniform2f;
+    setUniform3f = glUniform3f;
+    setUniform4f = glUniform4f;
 }
 
 Shader::~Shader()
 {
-    if (m_handle)
-        glDeleteProgram(m_handle);
+    glDeleteProgram(m_handle);
 }
 
 bool Shader::compile(const std::string &filename, GLenum type) noexcept
@@ -76,90 +81,38 @@ void Shader::unbind() noexcept
     glUseProgram(0);
 }
 
-
-void Shader::setUniform(const char *name, bool value) noexcept
+GLint Shader::getUniformLocation(const char *name) const noexcept
 {
-    GLint loc = getUniformLoc(name);
-
-    if (loc != -1)
-        glUniform1i(loc, (int)value);
+    return glGetUniformLocation(m_handle, name);
 }
 
-void Shader::setUniform(const char *name, int value) noexcept
+GLuint Shader::getHandle() const noexcept
 {
-    GLint loc = getUniformLoc(name);
-
-    if (loc != -1)
-        glUniform1i(loc, value);
+    return m_handle;
 }
 
-void Shader::setUniform(const char *name, float value) noexcept
+void Shader::setUniform(GLint loc, const glm::vec2 &value) noexcept
 {
-    GLint loc = getUniformLoc(name);
-
-    if (loc != -1)
-        glUniform1f(loc, value);
-}
-
-void Shader::setUniform(const char *name, float x, float y) noexcept
-{
-    GLint loc = getUniformLoc(name);
-
-    if (loc != -1)
-        glUniform2f(loc, x, y);
-}
-
-void Shader::setUniform(const char *name, float x, float y, float z) noexcept
-{
-    GLint loc = getUniformLoc(name);
-
-    if (loc != -1)
-        glUniform3f(loc, x, y, z);
-}
-
-void Shader::setUniform(const char *name, float x, float y, float z, float w) noexcept
-{
-    GLint loc = getUniformLoc(name);
-
-    if (loc != -1)
-        glUniform4f(loc, x, y, z, w);
-}
-
-void Shader::setUniform(const char *name, const glm::vec2 &value) noexcept
-{
-    GLint loc = getUniformLoc(name);
-
     if (loc != -1)
         glUniform2fv(loc, 1, &value[0]);
 }
 
-void Shader::setUniform(const char *name, const glm::vec3 &value) noexcept
+void Shader::setUniform(GLint loc, const glm::vec3 &value) noexcept
 {
-    GLint loc = getUniformLoc(name);
-
     if (loc != -1)
         glUniform3fv(loc, 1, &value[0]);
 }
 
-void Shader::setUniform(const char *name, const glm::vec4 &value) noexcept
+void Shader::setUniform(GLint loc, const glm::vec4 &value) noexcept
 {
-    GLint loc = getUniformLoc(name);
-
     if (loc != -1)
         glUniform4fv(loc, 1, &value[0]);
 }
 
-void Shader::setUniform(const char *name, const glm::mat4 &matrix) noexcept
+void Shader::setUniform(GLint loc, const glm::mat4 &matrix) noexcept
 {
-    GLint loc = getUniformLoc(name);
-
     if (loc != -1)
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
-void Shader::setUniform(const char *name, const Color& color) noexcept
-{   
-    setUniform(name, glm::vec4(color.r / 255.f, color.g / 255.f, color.b / 255.f, color.a / 255.f));
 }
 
 void Shader::checkCompileErrors(GLuint shader, std::string type)
@@ -187,23 +140,4 @@ void Shader::checkCompileErrors(GLuint shader, std::string type)
                       << infoLog << "\n -- --------------------------------------------------- -- \n";
         }
     }
-}
-
-GLint Shader::getUniformLoc(const char *name)
-{
-    auto found = m_uniformLocs.find(name);
-
-    if (found == m_uniformLocs.end())
-    {
-        GLint loc = glGetUniformLocation(m_handle, name);
-
-        if (loc == -1)
-            return -1;
-
-        bool sucsess = m_uniformLocs.try_emplace(name, loc).second;
-
-        return sucsess ? loc : -1;
-    }
-
-    return found->second;
 }
