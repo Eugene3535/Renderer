@@ -2,8 +2,8 @@
 #include <GLFW/glfw3.h>
 
 #include "Graphics/Shader.hpp"
-#include "Loaders/AssetManager.hpp"
-#include "Loaders/TileMap.hpp"
+#include "Managers/AssetManager.hpp"
+#include "TileMap.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

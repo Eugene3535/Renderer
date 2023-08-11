@@ -1,4 +1,4 @@
-#include "Loaders/TileMap.hpp"
+#include "TileMap.hpp"
 
 #include <sstream>
 #include <iostream>
@@ -12,7 +12,7 @@
 #include "Utils/Files.hpp"
 #include "Utils/Defines.hpp"
 
-#include "Loaders/AssetManager.hpp"
+#include "Managers/AssetManager.hpp"
 
 TileMap::TileMap()
 {
@@ -150,7 +150,7 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 			[](GLuint n) { return n > 0; });
 
 		auto& plane = m_tilePlanes.emplace_back();
-		plane.name = name;
+		plane.m_name = name;
 
 		for (GLint y = 0; y < map_height; ++y)
 			for (GLint x = 0; x < map_width; ++x)
@@ -167,7 +167,7 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 						});
 
 					// Is there associated tile layer for this tileset?
-					auto current_layer = std::find_if(plane.tileLayers.begin(), plane.tileLayers.end(),
+					auto current_layer = std::find_if(plane.m_tileLayers.begin(), plane.m_tileLayers.end(),
 						[&current_tileset](const TileMap::TilePlane::TileLayer& layer)
 						{
 							return current_tileset->pTexture == layer.pTexture;
@@ -175,11 +175,11 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 
 					TileMap::TilePlane::TileLayer* pLayer = nullptr;
 					// If not - we will create it
-					if (current_layer != plane.tileLayers.end())
+					if (current_layer != plane.m_tileLayers.end())
 						pLayer = std::addressof(*current_layer);
 					else
 					{
-						pLayer = std::addressof(plane.tileLayers.emplace_back());
+						pLayer = std::addressof(plane.m_tileLayers.emplace_back());
 						pLayer->pTexture = current_tileset->pTexture;
 					}
 
@@ -221,7 +221,7 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 	}
 
 	for(auto& plane : m_tilePlanes)
-		for(auto& layer : plane.tileLayers)
+		for(auto& layer : plane.m_tileLayers)
 		{
 			glGenVertexArrays(1, &layer.vao);
 	 		glGenBuffers(1, &layer.vbo);
@@ -254,7 +254,7 @@ void TileMap::draw(const GLuint shader) noexcept
 	glUseProgram(shader);
 
 	for(auto& plane : m_tilePlanes)
-		for(auto& layer : plane.tileLayers)
+		for(auto& layer : plane.m_tileLayers)
 		{
 			layer.pTexture->bind();
 			glBindVertexArray(layer.vao);
