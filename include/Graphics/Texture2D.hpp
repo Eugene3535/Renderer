@@ -24,10 +24,10 @@ public:
     void setRepeated(bool repeat) noexcept;
     void setSmooth(bool smooth)   noexcept;
 
-    bool isRepeated()             const noexcept;
-    bool isSmooth()               const noexcept;
-    const glm::ivec2&   getSize() const noexcept;
-    GLuint getHandle()            const noexcept;
+    bool isRepeated()           const noexcept;
+    bool isSmooth()             const noexcept;
+    const glm::ivec2& getSize() const noexcept;
+    GLuint getHandle()          const noexcept;
 
 private:
     glm::ivec2 m_size;

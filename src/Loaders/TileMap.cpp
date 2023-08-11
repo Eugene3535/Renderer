@@ -12,7 +12,7 @@
 #include "Utils/Files.hpp"
 #include "Utils/Defines.hpp"
 
-#include "Loaders/AssetLoader.hpp"
+#include "Loaders/AssetManager.hpp"
 
 TileMap::TileMap()
 {
@@ -56,7 +56,7 @@ std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_nod
 		auto pTexName       = pTilesetNode->first_attribute("name");
 		std::string texName = pTexName ?  pTexName->value() : std::string();
 
-		auto pTileset = AssetLoader::getTexture(texName);
+		auto pTileset = AssetManager::get<Texture2D>(texName);
 
 		if( pTileset == nullptr )
 			continue;

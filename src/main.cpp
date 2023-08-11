@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Graphics/Shader.hpp"
-#include "Loaders/AssetLoader.hpp"
+#include "Loaders/AssetManager.hpp"
 #include "Loaders/TileMap.hpp"
 
 #include <glm/glm.hpp>
@@ -69,7 +69,7 @@ int main()
     auto res = shader.compile("res/shaders/shader.vert", "res/shaders/shader.frag");
     shader.bind();
 
-    AssetLoader al;
+    AssetManager al;
 
     TileMap tm;
     tm.loadFromFile("Map1");

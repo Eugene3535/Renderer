@@ -46,7 +46,7 @@ bool Shader::compile(const std::string &filename, GLenum type) noexcept
 
     GLuint shader = glCreateShader(type);
 
-    const GLchar *c_str = source.c_str();
+    const GLchar* c_str = source.c_str();
 
     glShaderSource(shader, 1, &c_str, 0);
     glCompileShader(shader);
