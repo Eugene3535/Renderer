@@ -4,9 +4,9 @@
 #include <filesystem>
 #include <algorithm>
 
-std::string FileUtils::getPathToFile(const std::string& filename, const std::string& folder)
+std::string FileUtils::getPathToFile(const std::string& filename, const std::string& target_folder)
 {   
-    const std::string texture_folder = "res/" + folder;
+    const std::string texture_folder = "res/" + target_folder;
 
     for (auto& file : std::filesystem::recursive_directory_iterator(texture_folder))
         if (file.path().stem().string() == filename)

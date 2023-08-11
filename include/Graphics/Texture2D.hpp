@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <glad/glad.h>
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
@@ -19,19 +19,21 @@ public:
     ~Texture2D();
 
     bool loadFromFile(const std::string& filepath) noexcept;
-    void bind(GLuint slot = 0)    noexcept;
-    void unbind()                 noexcept;
+
+    static void bind(const Texture2D* pTexture, unsigned slot = 0) noexcept;
+    void unbind() noexcept;
+
     void setRepeated(bool repeat) noexcept;
     void setSmooth(bool smooth)   noexcept;
 
     bool isRepeated()           const noexcept;
     bool isSmooth()             const noexcept;
     const glm::ivec2& getSize() const noexcept;
-    GLuint getHandle()          const noexcept;
+    unsigned getHandle()        const noexcept;
 
 private:
     glm::ivec2 m_size;
-    GLuint     m_handle;
+    unsigned   m_handle;
 
     bool m_isRepeated;
     bool m_isSmooth;

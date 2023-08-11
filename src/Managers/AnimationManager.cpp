@@ -1,25 +1,55 @@
 #include "Managers/AnimationManager.hpp"
 #include "Utils/Files.hpp"
+#include "Graphics/Texture2D.hpp"
+
+#include <glad/glad.h>
 
 #include "rapidxml_ext.h"
 #include "rapidxml_utils.hpp"
 
+AnimationManager* AnimationManager::m_pInstance;
+
 AnimationManager::AnimationManager() noexcept
 {
+	if (!m_pInstance)
+		m_pInstance = this;
 }
 
 AnimationManager::~AnimationManager()
 {
-    m_animMap.clear();
-    m_frameList.clear();
+	for (const auto& [name, anim] : m_pInstance->m_animations)
+	{
+		glDeleteBuffers(1, &anim.vbo);
+		glDeleteVertexArrays(1, &anim.vao);
+	}
+
+	for (const auto& [name, sprite_sheet] : m_pInstance->m_spriteSheets)
+	{
+		for (const auto& [name, anim] : sprite_sheet)
+		{
+			glDeleteBuffers(1, &anim->vbo);
+			glDeleteVertexArrays(1, &anim->vao);
+		}
+	}
+
+	m_pInstance->m_animations.clear();
+    m_pInstance->m_spriteSheets.clear();
 }
 
-bool AnimationManager::create(const std::string& name, const sf::Texture* pTexture, const glm::ivec4& frame) noexcept
+const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, const glm::ivec4& frame) noexcept
 {
-	auto it = m_animMap.try_emplace(name);
+	if (!m_pInstance)
+		return nullptr;
+
+	const auto pAnim = m_pInstance->getAnimation(name);
+
+	if (pAnim)
+		return pAnim;
+
+	auto it = m_pInstance->m_animations.try_emplace(name);
 
 	if( ! it.second )
-		return false;
+		return nullptr;
 
 	auto& anim = it.first->second;
 	auto& frames = m_frameList.emplace_back();
@@ -32,8 +62,16 @@ bool AnimationManager::create(const std::string& name, const sf::Texture* pTextu
 	return true;
 }
 
-bool AnimationManager::create(const std::string& name, const sf::Texture* pTexture, const glm::ivec4& startFrame, int duration, float fps, float delay) noexcept
+const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, const glm::ivec4& startFrame, int duration, float fps, float delay) noexcept
 {
+	if (!m_pInstance)
+		return nullptr;
+
+	const auto pAnim = m_pInstance->getAnimation(name);
+
+	if (pAnim)
+		return pAnim;
+
 	auto it = m_animMap.try_emplace(name);
 
 	if( ! it.second )
@@ -55,8 +93,16 @@ bool AnimationManager::create(const std::string& name, const sf::Texture* pTextu
 	return true;
 }
 
-bool AnimationManager::create(const std::string& name, const sf::Texture* pTexture, int duration, float fps, float delay) noexcept
+const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, int duration, float fps, float delay) noexcept
 {
+	if (!m_pInstance)
+		return nullptr;
+
+	const auto pAnim = m_pInstance->getAnimation(name);
+
+	if (pAnim)
+		return pAnim;
+
 	auto it = m_animMap.try_emplace(name);
 
 	if( ! it.second )
@@ -81,8 +127,16 @@ bool AnimationManager::create(const std::string& name, const sf::Texture* pTextu
 	return true;
 }
 
-bool AnimationManager::create(const std::string& name, const sf::Texture* pTexture, int rows, int columns, float fps, float delay) noexcept
+const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, int rows, int columns, float fps, float delay) noexcept
 {
+	if (!m_pInstance)
+		return nullptr;
+
+	const auto pAnim = m_pInstance->getAnimation(name);
+
+	if (pAnim)
+		return pAnim;
+
 	auto it = m_animMap.try_emplace(name);
 
 	if( ! it.second )
@@ -110,8 +164,16 @@ bool AnimationManager::create(const std::string& name, const sf::Texture* pTextu
 	return true;
 }
 
-bool AnimationManager::loadSpriteSheet(const std::string& filename, const sf::Texture* pTexture) noexcept
+const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std::string& filename, const Texture2D* pTexture) noexcept
 {
+	if (!m_pInstance)
+		return nullptr;
+
+	const auto pSpriteSheet = m_pInstance->getSpriteSheet(name);
+
+	if (pSpriteSheet)
+		return pSpriteSheet;
+
 	const std::string filepath = FileUtils::getPathToFile(filename, "animations");
 
 	if(filepath.empty())
@@ -180,16 +242,16 @@ bool AnimationManager::loadSpriteSheet(const std::string& filename, const sf::Te
 	return !pSpriteSheet->empty();
 }
 
-const Animation* AnimationManager::getAnimation(const std::string& name) const noexcept
+const Animation* AnimationManager::getAnimation(const std::string& name) noexcept
 {
-    auto found = m_animMap.find(name);
+    auto found = m_pInstance->m_animations.find(name);
 
-    return (found != m_animMap.end()) ? &found->second : nullptr;
+    return (found != m_pInstance->m_animations.end()) ? &found->second : nullptr;
 }
 
-const AnimationManager::SpriteSheet* AnimationManager::getSpriteSheet(const std::string& name) const noexcept
+const AnimationManager::SpriteSheet* AnimationManager::getSpriteSheet(const std::string& name) noexcept
 {
-	auto found = m_spriteSheets.find(name);
+	auto found = m_pInstance->m_spriteSheets.find(name);
 
-    return (found != m_spriteSheets.end()) ? &found->second : nullptr;
+    return (found != m_pInstance->m_spriteSheets.end()) ? &found->second : nullptr;
 }

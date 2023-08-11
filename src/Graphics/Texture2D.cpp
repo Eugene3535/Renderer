@@ -1,6 +1,8 @@
 #include "Graphics/Texture2D.hpp"
 #include "Graphics/Image.hpp"
 
+#include <glad/glad.h>
+
 Texture2D::Texture2D()  noexcept: 
     m_size(),
     m_handle(0),
@@ -40,10 +42,13 @@ bool Texture2D::loadFromFile(const std::string& filepath) noexcept
     return true;
 }
 
-void Texture2D::bind(GLuint slot) noexcept
+void Texture2D::bind(const Texture2D* pTexture, unsigned slot) noexcept
 {
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, m_handle);
+    if (pTexture)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, pTexture->getHandle());
+    }
 }
 
 void Texture2D::unbind() noexcept

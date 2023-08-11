@@ -11,12 +11,12 @@
 
 struct Animation
 {
-	class Texture2D* pTexture = nullptr;
-	unsigned         vao = 0;
-	unsigned         vbo = 0;
-	unsigned         duration = 0;
-	float            rate     = 0.0f;
-	float            delay    = 1.0f;
+	const class Texture2D* pTexture = nullptr;
+	unsigned vao = 0;
+	unsigned vbo = 0;
+	unsigned duration = 0;
+	float    rate     = 0.0f;
+	float    delay    = 1.0f;
 };
 
 class AnimationManager
@@ -28,18 +28,21 @@ public:
     AnimationManager() noexcept;
     ~AnimationManager();
 
-	 bool create(const char* name, class Texture2D* pTexture, const glm::ivec4& frame) noexcept;
-	 bool create(const char* name, class Texture2D* pTexture, const glm::ivec4& startFrame, int duration, float fps, float delay = 1.0f) noexcept;
-	 bool create(const char* name, class Texture2D* pTexture, int duration, float fps, float delay = 1.0f) noexcept;
-	 bool create(const char* name, class Texture2D* pTexture, int columns, int rows, float fps, float delay = 1.0f) noexcept;
-	 bool loadSpriteSheet(const char* filename, class Texture2D* pTexture) noexcept;
+	 static const Animation* create(const char* name, const class Texture2D* pTexture, const glm::ivec4& frame) noexcept;
+	 static const Animation* create(const char* name, const class Texture2D* pTexture, const glm::ivec4& startFrame, int duration, float fps, float delay = 1.0f) noexcept;
+	 static const Animation* create(const char* name, const class Texture2D* pTexture, int duration, float fps, float delay = 1.0f) noexcept;
+	 static const Animation* create(const char* name, const class Texture2D* pTexture, int columns, int rows, float fps, float delay = 1.0f) noexcept;
+	 static const SpriteSheet* loadSpriteSheet(const std::string& filename, const class Texture2D* pTexture) noexcept;
 
-    const Animation*   getAnimation(const std::string& name)   const noexcept;
-	const SpriteSheet* getSpriteSheet(const std::string& name) const noexcept;
+    static const Animation*   getAnimation(const std::string& name)   noexcept;
+	static const SpriteSheet* getSpriteSheet(const std::string& name) noexcept;
 
 private:
-	std::unordered_map<std::string, Animation>   m_animMap;
+	std::unordered_map<std::string, Animation>   m_animations;
 	std::unordered_map<std::string, SpriteSheet> m_spriteSheets;
+
+private:
+	static AnimationManager* m_pInstance;
 };
 
 #endif
