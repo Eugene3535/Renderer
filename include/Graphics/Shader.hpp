@@ -1,7 +1,6 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include <string>
@@ -19,30 +18,30 @@ public:
 	Shader& operator = (const Shader&& other) = delete;
     ~Shader();
     
-    bool compile(const std::string& filename, GLenum type) noexcept;
+    bool compile(const std::string& filename, unsigned type) noexcept;
     bool compile(const std::string& filename_vert, const std::string& filename_frag) noexcept;
     bool compile(const std::string& filename_vert, const std::string& filename_frag, const std::string& filename_geom) noexcept;
 
     void bind() noexcept;
     void unbind() noexcept;
 
-    GLint  getUniformLocation(const char* name) const noexcept;
-    GLuint getHandle() const noexcept;
+    int  getUniformLocation(const char* name) const noexcept;
+    unsigned getHandle() const noexcept;
 
-    void (*setUniform1i)(GLint loc, GLint value) = nullptr;
-    void (*setUniform1f)(GLint loc, GLfloat value) = nullptr;
-    void (*setUniform2f)(GLint loc, GLfloat x, GLfloat y) = nullptr;
-    void (*setUniform3f)(GLint loc, GLfloat x, GLfloat y, GLfloat z) = nullptr;
-    void (*setUniform4f)(GLint loc, GLfloat x, GLfloat y, GLfloat z, GLfloat w) = nullptr;
+    void (*setUniform1i)(int loc, int value) = nullptr;
+    void (*setUniform1f)(int loc, float value) = nullptr;
+    void (*setUniform2f)(int loc, float x, float y) = nullptr;
+    void (*setUniform3f)(int loc, float x, float y, float z) = nullptr;
+    void (*setUniform4f)(int loc, float x, float y, float z, float w) = nullptr;
 
-    void setUniform(GLint loc, const glm::vec2& value) noexcept;
-    void setUniform(GLint loc, const glm::vec3& value) noexcept;
-    void setUniform(GLint loc, const glm::vec4& value) noexcept;
-    void setUniform(GLint loc, const glm::mat4& matrix) noexcept;
+    void setUniform(int loc, const glm::vec2& value) noexcept;
+    void setUniform(int loc, const glm::vec3& value) noexcept;
+    void setUniform(int loc, const glm::vec4& value) noexcept;
+    void setUniform(int loc, const glm::mat4& matrix) noexcept;
 
 private:
-    void checkCompileErrors(GLuint shader, std::string type);
+    void checkCompileErrors(unsigned shader, std::string type);
 
-    GLuint m_handle;
+    unsigned m_handle;
 };
 #endif

@@ -1,11 +1,11 @@
+#include <glad/glad.h>
+#include "rapidxml_ext.h"
+#include "rapidxml_utils.hpp"
+
 #include "Managers/AnimationManager.hpp"
 #include "Utils/Files.hpp"
 #include "Graphics/Texture2D.hpp"
 #include "Graphics/Vertex2D.hpp"
-
-#include <glad/glad.h>
-#include "rapidxml_ext.h"
-#include "rapidxml_utils.hpp"
 
 AnimationManager* AnimationManager::m_pInstance;
 
@@ -36,7 +36,7 @@ AnimationManager::~AnimationManager()
     m_pInstance->m_spriteSheets.clear();
 }
 
-const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, const glm::ivec4& frame) noexcept
+const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, const IntRect& rect) noexcept
 {
 	if (!m_pInstance || !pTexture)
 		return nullptr;
@@ -53,50 +53,40 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 	auto& anim = it.first->second;
 
-	const auto& texSize = pTexture->getSize();
 	Vertex2D vertices[4]{};
 
-	vertices[1].x = frame.z;
+	FloatRect frame{ rect };
 
-	auto& frames = m_frameList.emplace_back();
-	frames.emplace_back(frame);
+	vertices[1].x = frame.width;
+	vertices[2].x = frame.width;
+	vertices[2].y = frame.height;
+	vertices[3].y = frame.height;
 
-	anim.pTexture = pTexture;
-	anim.pFrames  = frames.data();
-	anim.duration = frames.size();
+	const glm::vec2 texSize{ pTexture->getSize() };
 
-	return nullptr;
-}
+	float left   = frame.left / texSize.x;
+	float top    = frame.top / texSize.y;
+	float right  = (frame.left + frame.width) / texSize.x;
+	float bottom = (frame.top + frame.height) / texSize.y;
 
-const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, const glm::ivec4& startFrame, int duration, float fps, float delay) noexcept
-{
-	if (!m_pInstance || !pTexture)
-		return nullptr;
+	vertices[0].u = left;
+	vertices[0].v = top;
 
-	const auto pAnim = m_pInstance->getAnimation(name);
+	vertices[1].u = right;
+	vertices[1].v = top;
 
-	if (pAnim)
-		return pAnim;
+	vertices[2].u = right;
+	vertices[2].v = bottom;
 
-	auto it = m_animMap.try_emplace(name);
-
-	if( ! it.second )
-		return false;
-
-	auto& anim = it.first->second;
-	auto& frames = m_frameList.emplace_back();
-	frames.reserve(duration);
-
-	for (int i = 0; i < duration; ++i)
-		frames.emplace_back();
+	vertices[3].u = left;
+	vertices[3].v = bottom;
 
 	anim.pTexture = pTexture;
-	anim.pFrames  = frames.data();
-	anim.duration = frames.size();
-	anim.rate     = fps;
-	anim.delay    = delay;
+	anim.duration = 1;
 
-	return true;
+	m_pInstance->unloadOnGPU(vertices, anim);
+
+	return &anim;
 }
 
 const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, int duration, float fps, float delay) noexcept
@@ -109,31 +99,58 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 	if (pAnim)
 		return pAnim;
 
-	auto it = m_animMap.try_emplace(name);
+	auto it = m_pInstance->m_animations.try_emplace(name);
 
-	if( ! it.second )
-		return false;
+	if (!it.second)
+		return nullptr;
 
-    auto& anim = it.first->second;
-    auto& frames = m_frameList.emplace_back();
-    frames.reserve(duration);
+	auto& anim = it.first->second;
 
-	auto tex_size = pTexture->getSize();
-	int frame_width = tex_size.x / duration;
+	std::vector<Vertex2D> vertices(static_cast<std::size_t>(duration * 4));
 
-	for (int i = 0; i < duration; ++i)
-		frames.emplace_back(i * frame_width, 0, frame_width, tex_size.y);
+	const glm::vec2 texSize{ pTexture->getSize() };
+	float frameWidth = texSize.x / duration;
 
-    anim.pTexture = pTexture;
-	anim.pFrames  = frames.data();
-	anim.duration = frames.size();
+	for (std::size_t i = 0; i < vertices.size(); i += 4)
+	{
+		Vertex2D* quad = &vertices[i];
+
+		quad[1].x = frameWidth;
+		quad[2].x = frameWidth;
+		quad[2].y = texSize.y;
+		quad[3].y = texSize.y;
+
+		float offset = i * frameWidth;
+
+		float left   = offset / texSize.x;
+		float top    = 0.0f;
+		float right  = (offset + frameWidth) / texSize.x;
+		float bottom = 1.0f;
+
+		quad[0].u = left;
+		quad[0].v = top;
+
+		quad[1].u = right;
+		quad[1].v = top;
+
+		quad[2].u = right;
+		quad[2].v = bottom;
+
+		quad[3].u = left;
+		quad[3].v = bottom;
+	}
+
+	anim.pTexture = pTexture;
+	anim.duration = duration;
 	anim.rate     = fps;
 	anim.delay    = delay;
 
-	return true;
+	m_pInstance->unloadOnGPU(vertices.data(), anim);
+
+	return &anim;
 }
 
-const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, int rows, int columns, float fps, float delay) noexcept
+const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, int columns, int rows, float fps, float delay) noexcept
 {
 	if (!m_pInstance || !pTexture)
 		return nullptr;
@@ -143,31 +160,59 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 	if (pAnim)
 		return pAnim;
 
-	auto it = m_animMap.try_emplace(name);
+	auto it = m_pInstance->m_animations.try_emplace(name);
 
-	if( ! it.second )
-		return false;
+	if (!it.second)
+		return nullptr;
 
-    auto& anim = it.first->second;
-    auto& frames = m_frameList.emplace_back();
-    std::size_t duration = rows * columns;
-    frames.reserve(duration);
+	auto& anim = it.first->second;
 
-	auto tex_size = pTexture->getSize();
-	int frame_width = tex_size.x / columns;
-	int frame_height = tex_size.y / rows;
+	std::vector<Vertex2D> vertices(static_cast<std::size_t>(columns * rows * 4));
+
+	const glm::vec2 texSize{ pTexture->getSize() };
+
+	float frameWidth  = texSize.x / columns;
+	float frameHeight = texSize.y / rows;
 
 	for (int y = 0; y < rows; ++y)
 		for (int x = 0; x < columns; ++x)
-			frames.emplace_back(x * frame_width, y * frame_height, frame_width, frame_height);
+		{
+			Vertex2D* quad = &vertices[static_cast<std::size_t>(y * columns + x) * 4];
 
-    anim.pTexture = pTexture;
-	anim.pFrames  = frames.data();
-	anim.duration = frames.size();
+			quad[1].x = frameWidth;
+			quad[2].x = frameWidth;
+			quad[2].y = frameHeight;
+			quad[3].y = frameHeight;
+
+			float offsetX = x * frameWidth;
+			float offsetY = y * frameHeight;
+
+			float left = offsetX / texSize.x;
+			float top = offsetY / texSize.y;
+			float right = (offsetX + frameWidth) / texSize.x;
+			float bottom = (offsetY + frameHeight) / texSize.y;
+
+			quad[0].u = left;
+			quad[0].v = top;
+
+			quad[1].u = right;
+			quad[1].v = top;
+
+			quad[2].u = right;
+			quad[2].v = bottom;
+
+			quad[3].u = left;
+			quad[3].v = bottom;
+		}
+
+	anim.pTexture = pTexture;
+	anim.duration = columns * rows;
 	anim.rate     = fps;
 	anim.delay    = delay;
 
-	return true;
+	m_pInstance->unloadOnGPU(vertices.data(), anim);
+
+	return &anim;
 }
 
 const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std::string& filename, const Texture2D* pTexture) noexcept
@@ -175,25 +220,25 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 	if (!m_pInstance || !pTexture)
 		return nullptr;
 
-	const auto pSpriteSheet = m_pInstance->getSpriteSheet(name);
+	const auto already_loaded = m_pInstance->getSpriteSheet(filename);
 
-	if (pSpriteSheet)
-		return pSpriteSheet;
+	if (already_loaded)
+		return already_loaded;
 
 	const std::string filepath = FileUtils::getPathToFile(filename, "animations");
 
 	if(filepath.empty())
-		return false;
+		return nullptr;
 
-	auto document = std::make_unique<rapidxml::xml_document<char>>();
+	auto pDocument = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(filepath.c_str());
-	document->parse<0>(xmlFile.data());
-	const auto pSpritesNode = document->first_node("sprites");
+	pDocument->parse<0>(xmlFile.data());
+	const auto pSpritesNode = pDocument->first_node("sprites");
 
-	auto ssIt = m_spriteSheets.try_emplace(filename);
+	auto ssIt = m_pInstance->m_spriteSheets.try_emplace(filename);
 
 	if( ! ssIt.second )
-		return false;
+		return nullptr;
 
 	auto pSpriteSheet = &ssIt.first->second;
 
@@ -208,21 +253,21 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 
 		std::string title = pTitle->value();
 
-		auto it = m_animMap.try_emplace(title);
+		auto it = m_pInstance->m_animations.try_emplace(title);
 
 		if( ! it.second )
 			continue;
 
-		auto pAnim   = &it.first->second;
+		auto pAnim  = &it.first->second;
 		auto pDelay = pAnimNode->first_attribute("delay");
 
 		pAnim->pTexture = pTexture;
-		pAnim->delay    = pDelay ? sf::milliseconds(std::atoi(pDelay->value())).asSeconds() : 0.16f;
-		pAnim->rate     = 1.0f / pAnim->delay;
+		pAnim->delay    = pDelay ? std::atoi(pDelay->value()) * 0.001f : 1.0f; // Convert milliseconds to seconds
+		pAnim->rate     = 1.0f / pAnim->delay; // The number of frames shown per second
 
 		auto pCutNode = pAnimNode->first_node("cut");
 
-		auto& frames = m_frameList.emplace_back();
+		std::vector<FloatRect> frames;
 
 		while (pCutNode)
 		{
@@ -231,21 +276,60 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 			auto pW = pCutNode->first_attribute("w");
 			auto pH = pCutNode->first_attribute("h");
 
-			int x = pX ? atoi(pX->value()) : 0;
-			int y = pY ? atoi(pY->value()) : 0;
-			int w = pW ? atoi(pW->value()) : 0;
-			int h = pH ? atoi(pH->value()) : 0;
+			float x = pX ? ceilf(atof(pX->value())) : 0.0f;
+			float y = pY ? ceilf(atof(pY->value())) : 0.0f;
+			float w = pW ? ceilf(atof(pW->value())) : 0.0f;
+			float h = pH ? ceilf(atof(pH->value())) : 0.0f;
 
 			frames.emplace_back(x, y, w, h);
+			pAnim->duration++;
 
 			pCutNode = pCutNode->next_sibling();
 		}
 
-		pAnim->duration = static_cast<int>(frames.size());
+		if (frames.empty())
+			continue;
+
+		std::vector<Vertex2D> vertices(frames.size() * 4);
+
+		auto createVerticesFromFrame = [](const Texture2D* pTexture, const FloatRect& frame, std::vector<Vertex2D>& vec, std::size_t stride)
+		{
+			Vertex2D* quad = &vec[stride * 4];
+
+			quad[1].x = frame.width;
+			quad[2].x = frame.width;
+			quad[2].y = frame.height;
+			quad[3].y = frame.height;
+
+			const glm::vec2 texSize{ pTexture->getSize() };
+
+			float left   = frame.left / texSize.x;
+			float top    = frame.top / texSize.y;
+			float right  = (frame.left + frame.width) / texSize.x;
+			float bottom = (frame.top + frame.height) / texSize.y;
+
+			quad[0].u = left;
+			quad[0].v = top;
+
+			quad[1].u = right;
+			quad[1].v = top;
+
+			quad[2].u = right;
+			quad[2].v = bottom;
+
+			quad[3].u = left;
+			quad[3].v = bottom;
+		};
+
+		for (std::size_t i = 0; i < frames.size(); ++i)	
+			createVerticesFromFrame(pTexture, frames[i], vertices, i);
+		
+		unloadOnGPU(vertices.data(), *pAnim);
+
 		pSpriteSheet->emplace(title, pAnim);
 	}
 
-	return !pSpriteSheet->empty();
+	return pSpriteSheet;
 }
 
 const Animation* AnimationManager::getAnimation(const std::string& name) noexcept
@@ -262,15 +346,15 @@ const AnimationManager::SpriteSheet* AnimationManager::getSpriteSheet(const std:
     return (found != m_pInstance->m_spriteSheets.end()) ? &found->second : nullptr;
 }
 
-void AnimationManager::unloadOnGPU(const Vertex2D* vertices, Animation* pAnim) noexcept
+void AnimationManager::unloadOnGPU(const Vertex2D* vertices, Animation& pAnim) noexcept
 {
-	glGenVertexArrays(1, &pAnim->vao);
-	glGenBuffers(1, &pAnim->vbo);
+	glGenVertexArrays(1, &pAnim.vao);
+	glGenBuffers(1, &pAnim.vbo);
 
-	glBindVertexArray(pAnim->vao);
+	glBindVertexArray(pAnim.vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, pAnim->vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * pAnim->duration, vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, pAnim.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * pAnim.duration * 4, vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
 	glEnableVertexAttribArray(0);

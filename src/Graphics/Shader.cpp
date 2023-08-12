@@ -1,5 +1,6 @@
 #include "Graphics/Shader.hpp"
 
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <fstream>
@@ -23,7 +24,7 @@ Shader::~Shader()
     glDeleteProgram(m_handle);
 }
 
-bool Shader::compile(const std::string &filename, GLenum type) noexcept
+bool Shader::compile(const std::string &filename, unsigned type) noexcept
 {
     std::string source;
     std::ifstream ifs_stream;
@@ -81,7 +82,7 @@ void Shader::unbind() noexcept
     glUseProgram(0);
 }
 
-GLint Shader::getUniformLocation(const char *name) const noexcept
+int Shader::getUniformLocation(const char *name) const noexcept
 {
     return glGetUniformLocation(m_handle, name);
 }
@@ -91,25 +92,25 @@ GLuint Shader::getHandle() const noexcept
     return m_handle;
 }
 
-void Shader::setUniform(GLint loc, const glm::vec2& value) noexcept
+void Shader::setUniform(int loc, const glm::vec2& value) noexcept
 {
     if (loc != -1)
         glUniform2fv(loc, 1, glm::value_ptr(value));
 }
 
-void Shader::setUniform(GLint loc, const glm::vec3& value) noexcept
+void Shader::setUniform(int loc, const glm::vec3& value) noexcept
 {
     if (loc != -1)
         glUniform3fv(loc, 1, glm::value_ptr(value));
 }
 
-void Shader::setUniform(GLint loc, const glm::vec4& value) noexcept
+void Shader::setUniform(int loc, const glm::vec4& value) noexcept
 {
     if (loc != -1)
         glUniform4fv(loc, 1, glm::value_ptr(value));
 }
 
-void Shader::setUniform(GLint loc, const glm::mat4& matrix) noexcept
+void Shader::setUniform(int loc, const glm::mat4& matrix) noexcept
 {
     if (loc != -1)
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
@@ -117,8 +118,8 @@ void Shader::setUniform(GLint loc, const glm::mat4& matrix) noexcept
 
 void Shader::checkCompileErrors(GLuint shader, std::string type)
 {
-    GLint success;
-    GLchar infoLog[1024]{};
+    int success;
+    char infoLog[1024]{};
 
     if (type != "PROGRAM")
     {

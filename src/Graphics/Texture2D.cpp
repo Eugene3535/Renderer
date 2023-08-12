@@ -1,7 +1,7 @@
-#include "Graphics/Texture2D.hpp"
-#include "Graphics/Image.hpp"
-
 #include <glad/glad.h>
+
+#include "Graphics/Image.hpp"
+#include "Graphics/Texture2D.hpp"
 
 Texture2D::Texture2D()  noexcept: 
     m_size(),

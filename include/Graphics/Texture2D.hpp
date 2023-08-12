@@ -2,10 +2,7 @@
 #define TEXTURE2D_HPP
 
 #include <string>
-#include <vector>
 
-
-#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
 class Texture2D

@@ -1,17 +1,17 @@
+#include <iostream>
+#include <chrono>
+#include <thread>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include "Graphics/Shader.hpp"
-#include "Managers/AssetManager.hpp"
-#include "TileMap.hpp"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
-#include <chrono>
-#include <thread>
+#include "Graphics/Shader.hpp"
+#include "Managers/AssetManager.hpp"
+#include "TileMap.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimeStamp = std::chrono::time_point<Clock>;

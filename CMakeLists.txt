@@ -4,26 +4,7 @@ project(Platformer2D LANGUAGES C CXX)
 
 set(EXTERNAL_DIR "$ENV{External}")
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-
-    file(
-        GLOB_RECURSE SOURCE_LIST 
-        LIST_DIRECTORIES false
-        RELATIVE "${SRC_ROOT_PATH}"
-        "${SRC_ROOT_PATH}/*.c*"
-        "${SRC_ROOT_PATH}/*.h*"
-        "${SRC_ROOT_PATH}/*.cpp*"
-        "${SRC_ROOT_PATH}/*.hpp*"
-    )
-
-    foreach(SRC in ITEMS ${SOURCE_LIST})
-        get_filename_component(SOURCE_PATH "${SRC}" PATH)
-        string(REPLACE "/" "\\" SOURCE_PATH_MSVC "${SOURCE_PATH}")
-        source_group("${SOURCE_PATH_MSVC}" FILES "${SRC}")
-    endforeach()
-
-endif()
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp ${PROJECT_SOURCE_DIR}/src/*.c)
 
 add_compile_definitions("$<$<CONFIG:Debug>:DEBUG>")
 
@@ -33,7 +14,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 	add_compile_options(/fp:fast)
 endif()
 
-add_executable(${PROJECT_NAME} ${SOURCE_LIST})
+add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)

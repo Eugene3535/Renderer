@@ -1,11 +1,9 @@
-#ifndef TILE_MAP_LOADER_HPP
-#define TILE_MAP_LOADER_HPP
+#ifndef TILE_MAP_HPP
+#define TILE_MAP_HPP
 
 #include <string>
 #include <vector>
 #include <memory>
-
-#include <glad/glad.h>
 
 #include <glm/glm.hpp>
 
@@ -19,10 +17,10 @@ private:
 	struct TilesetData
 	{
 		class Texture2D* pTexture = nullptr;
-		GLuint columns   = 0;
-		GLuint rows      = 0;
-		GLuint tileCount = 0;
-		GLuint firstGID  = 1;
+		unsigned columns   = 0;
+		unsigned rows      = 0;
+		unsigned tileCount = 0;
+		unsigned firstGID  = 1;
 	};
 
 public:
@@ -31,10 +29,10 @@ public:
 		struct TileLayer
 		{
 			std::vector<Vertex2D> vertices; 
-			std::vector<GLuint>   indices;
+			std::vector<unsigned> indices;
 			class Texture2D* pTexture = nullptr;
-			GLuint vao = 0;
-			GLuint vbo = 0;
+			unsigned vao = 0;
+			unsigned vbo = 0;
 		};
 
 		std::string            m_name;
@@ -47,12 +45,12 @@ public:
 
 	bool loadFromFile(const std::string& filename);
 
-	void draw(const GLuint shader) noexcept;
+	void draw(const unsigned shader) noexcept;
 	
 private:
-	std::vector<TilesetData>   parseTilesets(const rapidxml::xml_node<char>* pMapNode);
-	std::vector<std::uint32_t> parseCSVstring(const rapidxml::xml_node<char>* pMapNode);
-	bool                       loadTilePlanes(const rapidxml::xml_node<char>* pMapNode);
+	std::vector<TilesetData> parseTilesets(const rapidxml::xml_node<char>* pMapNode);
+	std::vector<unsigned>    parseCSVstring(const rapidxml::xml_node<char>* pMapNode);
+	bool                     loadTilePlanes(const rapidxml::xml_node<char>* pMapNode);
 
 private:
 	std::vector<TilePlane> m_tilePlanes;

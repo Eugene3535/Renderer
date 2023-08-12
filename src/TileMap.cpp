@@ -1,5 +1,7 @@
 #include "TileMap.hpp"
 
+#include <glad/glad.h>
+
 #include <sstream>
 #include <iostream>
 #include <algorithm>
@@ -77,19 +79,19 @@ std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_nod
 	return tilesets;
 }
 
-std::vector<GLuint> TileMap::parseCSVstring(const rapidxml::xml_node<char>* pDataNode)
+std::vector<unsigned> TileMap::parseCSVstring(const rapidxml::xml_node<char>* pDataNode)
 {
 	std::string data(pDataNode->value());
 
 	std::size_t amount = std::count_if(data.begin(), data.end(), [](char c){ return c == ','; }) + 1;
 	std::replace(data.begin(), data.end(), ',', ' ');
 
-	std::vector<GLuint> parsed_layer;
+	std::vector<unsigned> parsed_layer;
 	parsed_layer.reserve(amount);
 
 	std::stringstream sstream(data);
 	{
-		GLuint tile_num = 0;
+		unsigned tile_num = 0;
 
 		while (sstream >> tile_num)
 			parsed_layer.push_back(tile_num);
@@ -110,10 +112,10 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 	auto pTileW = pMapNode->first_attribute("tilewidth");
 	auto pTileH = pMapNode->first_attribute("tileheight");
 
-	const GLint map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
-	const GLint map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
-	const GLint tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
-	const GLint tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
+	const unsigned map_width   = pMapW  ? std::atoi(pMapW->value())  : 0;
+	const unsigned map_height  = pMapH  ? std::atoi(pMapH->value())  : 0;
+	const unsigned tile_width  = pTileW ? std::atoi(pTileW->value()) : 0;
+	const unsigned tile_height = pTileH ? std::atoi(pTileH->value()) : 0;
 
 #ifdef DEBUG
 	if( ! map_width || ! map_height || ! tile_width || ! tile_height ) 
@@ -133,29 +135,23 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 		if(name.empty())
 			continue;
 
-		if (name == "Collision mask")
-		{
-			//pTileMap->collisionMask = loadCollisionMask(pMapNode); 
-			continue;
-		}
-
 		auto pDataNode = pLayerNode->first_node("data");
 
 		if( ! pDataNode )
 			continue;
 
-		std::vector<GLuint> parsed_layer = parseCSVstring(pDataNode);
+		std::vector<unsigned> parsed_layer = parseCSVstring(pDataNode);
 
 		std::size_t non_zero_tile_count = std::count_if(parsed_layer.begin(), parsed_layer.end(),
-			[](GLuint n) { return n > 0; });
+			[](unsigned n) { return n > 0; });
 
 		auto& plane = m_tilePlanes.emplace_back();
 		plane.m_name = name;
 
-		for (GLint y = 0; y < map_height; ++y)
-			for (GLint x = 0; x < map_width; ++x)
+		for (unsigned y = 0; y < map_height; ++y)
+			for (unsigned x = 0; x < map_width; ++x)
 			{
-				GLuint tile_id = parsed_layer[y * map_width + x];
+				unsigned tile_id = parsed_layer[y * map_width + x];
 
 				if (tile_id)
 				{
@@ -184,11 +180,11 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 					}
 
 					// Find the sequence tile number in this tileset
-					GLuint tile_num = tile_id - current_tileset->firstGID;
+					unsigned tile_num = tile_id - current_tileset->firstGID;
 
 					// left-top coords of the tile in texture grid
-					GLuint Y = (tile_num >= current_tileset->columns) ? tile_num / current_tileset->columns : 0;
-					GLuint X = tile_num % current_tileset->columns;
+					unsigned Y = (tile_num >= current_tileset->columns) ? tile_num / current_tileset->columns : 0;
+					unsigned X = tile_num % current_tileset->columns;
 					glm::vec2 tex_coords(X * tile_width, Y * tile_height);
 
 					int width = pLayer->pTexture->getSize().x;
@@ -199,7 +195,7 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 					float right  = (tex_coords.x + tile_width)  / width;
 					float bottom = (tex_coords.y + tile_height) / height;
 
-					GLuint index = static_cast<GLuint>(pLayer->vertices.size());
+					unsigned index = static_cast<unsigned>(pLayer->vertices.size());
 
 					// Quad
 					pLayer->vertices.emplace_back(x * tile_width,              y * tile_height + tile_height, left,  bottom, Color::White);
@@ -249,16 +245,16 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode)
 	return ! m_tilePlanes.empty();
 }
 
-void TileMap::draw(const GLuint shader) noexcept
+void TileMap::draw(const unsigned shader) noexcept
 {
 	glUseProgram(shader);
 
 	for(auto& plane : m_tilePlanes)
 		for(auto& layer : plane.m_tileLayers)
 		{
-			layer.pTexture->bind();
+			layer.pTexture->bind(layer.pTexture);
 			glBindVertexArray(layer.vao);
-			glDrawElements(GL_TRIANGLES, static_cast<GLuint>(layer.indices.size()), GL_UNSIGNED_INT, layer.indices.data());
+			glDrawElements(GL_TRIANGLES, static_cast<unsigned>(layer.indices.size()), GL_UNSIGNED_INT, layer.indices.data());
 			glBindVertexArray(0);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
