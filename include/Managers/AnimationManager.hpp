@@ -38,6 +38,9 @@ public:
 	static const SpriteSheet* getSpriteSheet(const std::string& name) noexcept;
 
 private:
+	static void unloadOnGPU(const class Vertex2D* vertices, Animation* pAnim) noexcept;
+
+private:
 	std::unordered_map<std::string, Animation>   m_animations;
 	std::unordered_map<std::string, SpriteSheet> m_spriteSheets;
 

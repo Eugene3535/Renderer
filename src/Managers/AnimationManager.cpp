@@ -1,9 +1,9 @@
 #include "Managers/AnimationManager.hpp"
 #include "Utils/Files.hpp"
 #include "Graphics/Texture2D.hpp"
+#include "Graphics/Vertex2D.hpp"
 
 #include <glad/glad.h>
-
 #include "rapidxml_ext.h"
 #include "rapidxml_utils.hpp"
 
@@ -38,7 +38,7 @@ AnimationManager::~AnimationManager()
 
 const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, const glm::ivec4& frame) noexcept
 {
-	if (!m_pInstance)
+	if (!m_pInstance || !pTexture)
 		return nullptr;
 
 	const auto pAnim = m_pInstance->getAnimation(name);
@@ -52,6 +52,12 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 		return nullptr;
 
 	auto& anim = it.first->second;
+
+	const auto& texSize = pTexture->getSize();
+	Vertex2D vertices[4]{};
+
+	vertices[1].x = frame.z;
+
 	auto& frames = m_frameList.emplace_back();
 	frames.emplace_back(frame);
 
@@ -59,12 +65,12 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 	anim.pFrames  = frames.data();
 	anim.duration = frames.size();
 
-	return true;
+	return nullptr;
 }
 
 const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, const glm::ivec4& startFrame, int duration, float fps, float delay) noexcept
 {
-	if (!m_pInstance)
+	if (!m_pInstance || !pTexture)
 		return nullptr;
 
 	const auto pAnim = m_pInstance->getAnimation(name);
@@ -95,7 +101,7 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, int duration, float fps, float delay) noexcept
 {
-	if (!m_pInstance)
+	if (!m_pInstance || !pTexture)
 		return nullptr;
 
 	const auto pAnim = m_pInstance->getAnimation(name);
@@ -129,7 +135,7 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 const Animation* AnimationManager::create(const char* name, const Texture2D* pTexture, int rows, int columns, float fps, float delay) noexcept
 {
-	if (!m_pInstance)
+	if (!m_pInstance || !pTexture)
 		return nullptr;
 
 	const auto pAnim = m_pInstance->getAnimation(name);
@@ -166,7 +172,7 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std::string& filename, const Texture2D* pTexture) noexcept
 {
-	if (!m_pInstance)
+	if (!m_pInstance || !pTexture)
 		return nullptr;
 
 	const auto pSpriteSheet = m_pInstance->getSpriteSheet(name);
@@ -254,4 +260,27 @@ const AnimationManager::SpriteSheet* AnimationManager::getSpriteSheet(const std:
 	auto found = m_pInstance->m_spriteSheets.find(name);
 
     return (found != m_pInstance->m_spriteSheets.end()) ? &found->second : nullptr;
+}
+
+void AnimationManager::unloadOnGPU(const Vertex2D* vertices, Animation* pAnim) noexcept
+{
+	glGenVertexArrays(1, &pAnim->vao);
+	glGenBuffers(1, &pAnim->vbo);
+
+	glBindVertexArray(pAnim->vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, pAnim->vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * pAnim->duration, vertices, GL_STATIC_DRAW);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, u));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, color));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }

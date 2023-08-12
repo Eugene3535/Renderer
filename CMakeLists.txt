@@ -4,25 +4,26 @@ project(Platformer2D LANGUAGES C CXX)
 
 set(EXTERNAL_DIR "$ENV{External}")
 
-set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    set(SRC_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
 
-file(
-    GLOB_RECURSE SOURCE_LIST 
-    LIST_DIRECTORIES false
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
-    "${SRC_ROOT_PATH}/*.c*"
-    "${SRC_ROOT_PATH}/*.h*"
-	"${SRC_ROOT_PATH}/*.cpp*"
-    "${SRC_ROOT_PATH}/*.hpp*"
-)
+    file(
+        GLOB_RECURSE SOURCE_LIST 
+        LIST_DIRECTORIES false
+        RELATIVE "${SRC_ROOT_PATH}"
+        "${SRC_ROOT_PATH}/*.c*"
+        "${SRC_ROOT_PATH}/*.h*"
+        "${SRC_ROOT_PATH}/*.cpp*"
+        "${SRC_ROOT_PATH}/*.hpp*"
+    )
 
-add_executable(${PROJECT_NAME} ${SOURCE_LIST})
+    foreach(SRC in ITEMS ${SOURCE_LIST})
+        get_filename_component(SOURCE_PATH "${SRC}" PATH)
+        string(REPLACE "/" "\\" SOURCE_PATH_MSVC "${SOURCE_PATH}")
+        source_group("${SOURCE_PATH_MSVC}" FILES "${SRC}")
+    endforeach()
 
-foreach(SRC in ITEMS ${SOURCE_LIST})
-    get_filename_component(SOURCE_PATH "${SRC}" PATH)
-    string(REPLACE "/" "\\" SOURCE_PATH_MSVC "${SOURCE_PATH}")
-    source_group("${SOURCE_PATH_MSVC}" FILES "${SRC}")
-endforeach()
+endif()
 
 add_compile_definitions("$<$<CONFIG:Debug>:DEBUG>")
 
@@ -31,6 +32,8 @@ if((CMAKE_CXX_COMPILER_ID MATCHES "Clang") OR (CMAKE_CXX_COMPILER_ID MATCHES "GN
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 	add_compile_options(/fp:fast)
 endif()
+
+add_executable(${PROJECT_NAME} ${SOURCE_LIST})
 
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
