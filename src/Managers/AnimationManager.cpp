@@ -225,7 +225,7 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 	if (already_loaded)
 		return already_loaded;
 
-	const std::string filepath = FileUtils::getPathToFile(filename, "animations");
+	const std::string filepath = FileUtils::getPathToFile(filename);
 
 	if(filepath.empty())
 		return nullptr;

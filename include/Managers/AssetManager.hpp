@@ -73,33 +73,44 @@ private:
     template<class T, class... Args>
     static T* tryLoadFromFile(const std::string& filename, const std::string& folder, std::unordered_map<std::string, T>& container, Args&& ...args) noexcept
     {
-        const std::string filepath = FileUtils::getPathToFile(filename, folder);
-
-        if( ! filepath.empty() )
+        if constexpr (std::is_same<T, Texture2D>::value)
         {
-            auto [iterator, result] = container.try_emplace(filename);
+            const std::string filepath = FileUtils::getPathToFile(filename);
 
-            if(result)
+            if (!filepath.empty())
             {
-//              Shader case with variadic templates
-                if constexpr (std::is_same<T, Shader>::value)
+                auto [iterator, result] = container.try_emplace(filename);
+
+                if (result)
                 {
-                    if( ! iterator->second.compile(filepath, std::forward<Args>(args)...))
+                    if (!iterator->second.loadFromFile(filepath))
                     {
                         container.erase(filename);
 
                         return nullptr;
                     }
                 }
-//              Image, Texture, etc...
-                else if( ! iterator->second.loadFromFile(filepath))
+
+                return &iterator->second;
+            }
+        }
+        else if constexpr (std::is_same<T, Shader>::value)
+        {
+            auto [iterator, result] = container.try_emplace(filename);
+
+            if (result)
+            {
+                auto shader = &iterator->second;
+
+                if (!iterator->second.compile(std::forward<Args>(args)...))
                 {
                     container.erase(filename);
 
                     return nullptr;
                 }
+
+                return &iterator->second;
             }
-            return &iterator->second;
         }
 
         return nullptr;

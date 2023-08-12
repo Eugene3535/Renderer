@@ -1,4 +1,5 @@
 #include "Graphics/Shader.hpp"
+#include "Utils/Files.hpp"
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -26,10 +27,15 @@ Shader::~Shader()
 
 bool Shader::compile(const std::string &filename, unsigned type) noexcept
 {
+    const std::string filepath = FileUtils::getPathToFile(filename);
+
+    if (filepath.empty())
+        return false;
+
     std::string source;
     std::ifstream ifs_stream;
 
-    ifs_stream.open(filename);
+    ifs_stream.open(filepath);
 
     if (ifs_stream.is_open())
     {

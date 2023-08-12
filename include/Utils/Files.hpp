@@ -5,7 +5,7 @@
 
 struct FileUtils
 {
-    static std::string getPathToFile(const std::string& filename, const std::string& target_folder);
+    static std::string getPathToFile(const std::string& filename);
 };
 
 #endif

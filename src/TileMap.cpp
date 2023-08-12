@@ -26,7 +26,7 @@ TileMap::~TileMap()
 
 bool TileMap::loadFromFile(const std::string& filename)
 {
-	std::string filepath = FileUtils::getPathToFile(filename, "levels");
+	std::string filepath = FileUtils::getPathToFile(filename);
 
 	if(filepath.empty())
 		return false;
@@ -55,9 +55,19 @@ std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_nod
 		      pTilesetNode != nullptr;
 		      pTilesetNode = pTilesetNode->next_sibling("tileset"))
 	{
-		auto pTexName       = pTilesetNode->first_attribute("name");
-		std::string texName = pTexName ?  pTexName->value() : std::string();
+		auto pImage = pTilesetNode->first_node("image");
+		auto pSource = pImage->first_attribute("source");
 
+		std::string texName = pSource ? pSource->value() : std::string();
+
+		if (texName.empty())
+			continue;
+
+		std::size_t last_slash_pos = texName.find_last_of('/');
+
+		if (last_slash_pos != std::string::npos)	
+			texName.erase(0, last_slash_pos + 1);
+		
 		auto pTileset = AssetManager::get<Texture2D>(texName);
 
 		if( pTileset == nullptr )
