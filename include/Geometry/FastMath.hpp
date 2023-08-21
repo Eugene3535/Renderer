@@ -1,7 +1,7 @@
-#ifndef GEOMETRY_HPP
-#define GEOMETRY_HPP
+#ifndef FAST_MATH_HPP
+#define FAST_MATH_HPP
 
-class Geometry
+class FastMath
 {
 public:
     static float sine(float angle);

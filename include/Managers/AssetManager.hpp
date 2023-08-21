@@ -27,7 +27,7 @@ public:
             if(auto it = m_pInstance->m_textures.find(filename); it != m_pInstance->m_textures.end())
                 return &it->second;
 
-            return tryLoadFromFile<Texture2D>(filename, "textures", m_pInstance->m_textures);
+            return tryLoadFromFile<Texture2D>(filename, m_pInstance->m_textures);
         }
         //      Shaders
         else if constexpr (std::is_same<T, Shader>::value)
@@ -35,7 +35,7 @@ public:
             if(auto it = m_pInstance->m_shaders.find(filename); it != m_pInstance->m_shaders.end())
                 return &it->second;
 
-            return tryLoadFromFile<Shader>(filename, "shaders", m_pInstance->m_shaders, std::forward<Args>(args)...);
+            return tryLoadFromFile<Shader>(filename, m_pInstance->m_shaders, std::forward<Args>(args)...);
         }
 
         return nullptr;
@@ -71,7 +71,7 @@ public:
 
 private:
     template<class T, class... Args>
-    static T* tryLoadFromFile(const std::string& filename, const std::string& folder, std::unordered_map<std::string, T>& container, Args&& ...args) noexcept
+    static T* tryLoadFromFile(const std::string& filename, std::unordered_map<std::string, T>& container, Args&& ...args) noexcept
     {
         if constexpr (std::is_same<T, Texture2D>::value)
         {
@@ -118,13 +118,10 @@ private:
 
 private:
     std::unordered_map<std::string, Texture2D> m_textures;
-    std::unordered_map<std::string, Shader> m_shaders;
+    std::unordered_map<std::string, Shader>    m_shaders;
 
 private:
     static AssetManager* m_pInstance;
 };
-
-
-
 
 #endif

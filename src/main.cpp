@@ -11,7 +11,7 @@
 
 #include "Graphics/Shader.hpp"
 #include "Managers/AssetManager.hpp"
-#include "TileMap.hpp"
+#include "World/TileMap.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimeStamp = std::chrono::time_point<Clock>;
@@ -65,17 +65,13 @@ int main()
         }, 0 );
 #endif
 
-    //Shader* shader = new Shader;
-    //auto res = shader->compile("res/shaders/VertexTileMap.vert", "res/shaders/FragmentTileMap.frag");
-    //shader->bind();
-
     AssetManager al;
 
     Shader* shader = AssetManager::get<Shader>("TileMapShader", "tilemap.vert", "tilemap.frag");
     shader->bind();
 
     TileMap tm;
-    tm.loadFromFile("Map1.tmx");
+    tm.loadFromFile("TestMap.tmx");
 
     glm::mat4 projection(1.0f);
     projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, -1.0f, 1.0f);
@@ -88,6 +84,7 @@ int main()
 
     shader->setUniform(projLoc, projection);
     shader->setUniform(viewLoc, view);
+
 
     TimeStamp timestamp = Clock::now();
 

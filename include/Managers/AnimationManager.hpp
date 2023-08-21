@@ -32,11 +32,11 @@ public:
 	 static const Animation* create(const char* name, const class Texture2D* pTexture, int columns, int rows, float fps, float delay = 1.0f) noexcept;
 	 static const SpriteSheet* loadSpriteSheet(const std::string& filename, const class Texture2D* pTexture) noexcept;
 
-    static const Animation*   getAnimation(const std::string& name)   noexcept;
-	static const SpriteSheet* getSpriteSheet(const std::string& name) noexcept;
+     static const Animation*   getAnimation(const std::string& name)   noexcept;
+	 static const SpriteSheet* getSpriteSheet(const std::string& name) noexcept;
 
 private:
-	static void unloadOnGPU(const class Vertex2D* vertices, Animation& pAnim) noexcept;
+	static void unloadOnGPU(const class Vertex2D* vertices, Animation& anim) noexcept;
 
 private:
 	std::unordered_map<std::string, Animation>   m_animations;

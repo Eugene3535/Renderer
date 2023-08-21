@@ -2,9 +2,9 @@
 #include <vector>
 
 #include "Utils/Defines.hpp"
-#include "Utils/Geometry.hpp"
+#include "Geometry/FastMath.hpp"
 
-float Geometry::sine(float angle)
+float FastMath::sine(float angle)
 {
 #ifdef DEBUG
     if( angle > 359.0f || angle < 0.0f)
@@ -24,7 +24,7 @@ float Geometry::sine(float angle)
     return table[static_cast<std::size_t>(angle)];
 }
 
-float Geometry::cosine(float angle)
+float FastMath::cosine(float angle)
 {
 #ifdef DEBUG
     if( angle > 359.0f || angle < 0.0f)

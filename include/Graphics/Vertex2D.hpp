@@ -6,12 +6,12 @@
 struct Vertex2D
 {
 	Vertex2D(): 
-		x(0.0f), y(0.0f), u(0.0f), v(0.0f), color(Color::White)
+		x(0.0f), y(0.0f), u(0.0f), v(0.0f)
 	{
 	}
 
-	Vertex2D(float x0, float y0, float u0, float v0, const Color& clr = Color::White): 
-		x(x0), y(y0), u(u0), v(v0), color(clr)
+	Vertex2D(float x0, float y0, float u0, float v0): 
+		x(x0), y(y0), u(u0), v(v0)
 	{
 	}
 
@@ -19,7 +19,6 @@ struct Vertex2D
 	float y;
 	float u;
 	float v;
-	Color color;
 };
 
 #endif

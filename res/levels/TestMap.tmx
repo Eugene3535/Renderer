@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="55" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="97">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="55" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="98">
  <tileset firstgid="1" name="tileset1" tilewidth="32" tileheight="32" tilecount="300" columns="20">
   <image source="../textures/tileset1.png" width="640" height="480"/>
  </tileset>
@@ -25,7 +25,7 @@
 107,106,106,106,106,106,0,0,0,9,10,11,86,87,2,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,3,
 107,0,0,0,0,0,0,0,0,0,109,0,0,0,0,0,110,0,0,0,110,0,0,0,110,0,0,0,0,0,0,6,7,2,2,2,2,2,2,2,0,0,0,0,2,2,2,0,0,0,0,0,0,0,3,
 107,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,7,26,26,3,3,3,3,3,3,2,0,0,0,0,2,3,2,0,0,0,0,0,0,0,3,
-107,0,0,0,0,106,0,0,0,0,0,0,381,381,0,0,0,0,0,0,0,0,0,381,0,0,0,21,22,26,26,46,3,3,46,3,3,3,46,2,2,2,2,2,2,3,2,2,2,0,0,0,0,0,3,
+107,0,0,0,0,106,0,0,0,0,0,0,381,381,0,0,0,0,0,0,0,0,0,381,0,0,0,21,22,26,26,46,3,3,46,3,3,3,46,2,2,2,2,2,2,3,2,2,1,0,0,0,0,0,3,
 107,106,106,106,106,106,106,106,0,0,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,61,41,42,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,3,
 83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83,83
 </data>
@@ -41,8 +41,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,309,0,0,0,0,0,0,0,0,0,0,0,429,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,309,0,0,0,0,0,0,0,0,0,0,0,430,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,309,0,0,0,0,0,0,0,0,0,0,0,430,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,309,0,414,0,0,0,0,0,0,0,0,0,430,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,309,0,413,0,0,0,0,0,0,0,0,0,430,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,309,0,0,0,0,0,0,0,0,0,0,0,430,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,309,0,0,0,0,0,0,0,0,0,0,0,430,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,430,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,431,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -54,55 +54,45 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="15" name="Слой объектов 1" visible="0">
-  <object id="48" name="solid" x="-2" y="-1" width="33" height="287"/>
-  <object id="49" name="solid" x="201" y="161" width="172" height="23"/>
-  <object id="50" name="solid" x="32" y="190" width="350" height="90"/>
-  <object id="51" name="solid" x="453" y="449" width="379" height="30"/>
-  <object id="52" name="solid" x="411" y="287" width="36" height="133"/>
-  <object id="53" name="solid" x="771" y="319" width="60" height="35"/>
-  <object id="54" name="solid" x="990" y="349" width="450" height="36"/>
-  <object id="55" name="solid" x="1054" y="159" width="129" height="32"/>
-  <object id="56" name="solid" x="1282" y="63" width="124" height="33"/>
-  <object id="57" name="solid" x="1448" y="223" width="118" height="31"/>
-  <object id="58" name="solid" x="1572" y="607" width="152" height="31"/>
-  <object id="59" name="solid" x="450" y="383" width="30" height="88"/>
-  <object id="60" name="ladder" x="361" y="67" width="12" height="91"/>
-  <object id="61" name="ladder" x="749" y="257" width="4" height="193"/>
-  <object id="62" name="ladder" x="1261" y="1" width="7" height="351"/>
-  <object id="63" name="enemy" gid="36" x="673" y="431" width="32" height="32"/>
-  <object id="64" name="enemy" gid="36" x="566" y="432" width="32" height="32"/>
-  <object id="65" name="enemy" gid="36" x="1104" y="144" width="32" height="32"/>
-  <object id="66" name="enemy" gid="36" x="1489" y="209" width="32" height="32"/>
-  <object id="67" name="enemy" gid="36" x="74" y="173" width="32" height="32"/>
-  <object id="68" name="player" gid="39" x="919" y="121" width="32" height="32"/>
-  <object id="69" name="solid" x="454" y="258" width="184" height="28"/>
-  <object id="70" name="enemy" gid="36" x="1177" y="461" width="32" height="32"/>
-  <object id="71" name="enemy" gid="36" x="1332" y="528" width="32" height="32"/>
-  <object id="72" name="solid" x="31" y="575" width="222" height="61"/>
-  <object id="73" name="solid" x="255" y="606" width="65" height="30"/>
-  <object id="74" name="solid" x="322" y="577" width="543" height="58"/>
-  <object id="75" name="solid" x="30" y="447" width="159" height="30"/>
-  <object id="76" name="solid" x="-1" y="287" width="29" height="316"/>
-  <object id="77" name="solid" x="1570" y="449" width="61" height="30"/>
-  <object id="78" name="solid" x="867" y="545" width="700" height="90"/>
-  <object id="79" name="solid" x="1407" y="482" width="95" height="64"/>
-  <object id="80" name="solid" x="1069" y="482" width="206" height="68"/>
-  <object id="81" name="solid" x="161" y="543" width="29" height="37"/>
-  <object id="82" name="solid" x="802" y="353" width="27" height="96"/>
-  <object id="83" name="SlopeLeft" x="381" y="157" width="126" height="67"/>
-  <object id="84" name="SlopeRight" x="128" y="156" width="64" height="32"/>
-  <object id="85" name="SlopeLeft" x="509" y="225" width="33" height="31"/>
-  <object id="86" name="SlopeLeft" x="990" y="282" width="70" height="64"/>
-  <object id="87" name="SlopeRight" x="801" y="283" width="29" height="33"/>
-  <object id="88" name="SlopeRight" x="1315" y="222" width="126" height="123"/>
-  <object id="89" name="solid" x="1633" y="160" width="93" height="29"/>
-  <object id="90" name="solid" x="1728" y="0" width="30" height="636"/>
-  <object id="91" name="SlopeRight" x="932" y="479" width="122" height="64"/>
-  <object id="92" name="solid" x="846" y="283" width="130" height="103"/>
-  <object id="93" name="MovingPlatform" gid="169" x="648" y="154" width="32" height="32"/>
-  <object id="94" name="MovingPlatform" gid="169" x="37" y="35" width="32" height="32"/>
+ <objectgroup id="15" name="Слой объектов 1">
+  <object id="48" name="solid" x="0" y="0" width="32" height="640"/>
+  <object id="49" name="solid" x="190" y="160" width="192" height="32"/>
+  <object id="50" name="solid" x="32" y="192" width="352" height="96"/>
+  <object id="51" name="solid" x="448" y="448" width="384" height="32"/>
+  <object id="52" name="solid" x="384" y="288" width="64" height="192"/>
+  <object id="53" name="solid" x="768" y="320" width="64" height="32"/>
+  <object id="54" name="solid" x="992" y="352" width="448" height="32"/>
+  <object id="55" name="solid" x="1056" y="160" width="128" height="32"/>
+  <object id="56" name="solid" x="1280" y="64" width="128" height="32"/>
+  <object id="57" name="solid" x="1440" y="224" width="128" height="32"/>
+  <object id="58" name="solid" x="1536" y="608" width="192" height="32"/>
+  <object id="59" name="solid" x="448" y="384" width="32" height="64"/>
+  <object id="60" name="ladder" x="352" y="64" width="32" height="96"/>
+  <object id="61" name="ladder" x="736" y="256" width="32" height="192"/>
+  <object id="62" name="ladder" x="1248" y="31" width="32" height="320"/>
+  <object id="69" name="solid" x="448" y="256" width="192" height="32"/>
+  <object id="72" name="solid" x="32" y="576" width="224" height="64"/>
+  <object id="73" name="solid" x="256" y="608" width="64" height="32"/>
+  <object id="74" name="solid" x="320" y="576" width="544" height="64"/>
+  <object id="75" name="solid" x="32" y="448" width="160" height="32"/>
+  <object id="77" name="solid" x="1568" y="448" width="64" height="32"/>
+  <object id="78" name="solid" x="864" y="544" width="672" height="96"/>
+  <object id="79" name="solid" x="1408" y="480" width="96" height="64"/>
+  <object id="80" name="solid" x="1056" y="480" width="224" height="64"/>
+  <object id="81" name="solid" x="160" y="544" width="32" height="32"/>
+  <object id="82" name="solid" x="800" y="352" width="32" height="96"/>
+  <object id="83" name="RightSlope" x="384" y="160" width="128" height="64"/>
+  <object id="84" name="LeftSlope" x="128" y="160" width="64" height="32"/>
+  <object id="85" name="RightSlope" x="512" y="224" width="32" height="32"/>
+  <object id="86" name="RightSlope" x="992" y="288" width="64" height="64"/>
+  <object id="87" name="LeftSlope" x="800" y="288" width="32" height="32"/>
+  <object id="88" name="LeftSlope" x="1312" y="224" width="128" height="128"/>
+  <object id="89" name="solid" x="1632" y="160" width="96" height="32"/>
+  <object id="90" name="solid" x="1728" y="0" width="32" height="640"/>
+  <object id="91" name="LeftSlope" x="928" y="480" width="128" height="64"/>
+  <object id="92" name="solid" x="832" y="288" width="160" height="96"/>
   <object id="95" name="solid" x="1631.5" y="353" width="94" height="30"/>
-  <object id="96" name="ladder" x="1163.5" y="152.5" width="7" height="195"/>
+  <object id="96" name="ladder" x="1152" y="160" width="32" height="192"/>
+  <object id="97" name="ladder" x="1536" y="224" width="32" height="160"/>
  </objectgroup>
 </map>

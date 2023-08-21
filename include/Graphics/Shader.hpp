@@ -38,6 +38,7 @@ public:
     void setUniform(int loc, const glm::vec3& value) noexcept;
     void setUniform(int loc, const glm::vec4& value) noexcept;
     void setUniform(int loc, const glm::mat4& matrix) noexcept;
+    void setUniform(int loc, const float* matrix) noexcept;
 
 private:
     void checkCompileErrors(unsigned shader, std::string type);

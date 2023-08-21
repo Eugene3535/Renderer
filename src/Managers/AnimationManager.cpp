@@ -55,19 +55,15 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 	Vertex2D vertices[4]{};
 
-	FloatRect frame{ rect };
+	vertices[1].x = static_cast<float>(rect.width);
+	vertices[2].x = static_cast<float>(rect.width);
+	vertices[2].y = static_cast<float>(rect.height);
+	vertices[3].y = static_cast<float>(rect.height);
 
-	vertices[1].x = frame.width;
-	vertices[2].x = frame.width;
-	vertices[2].y = frame.height;
-	vertices[3].y = frame.height;
-
-	const glm::vec2 texSize{ pTexture->getSize() };
-
-	float left   = frame.left / texSize.x;
-	float top    = frame.top / texSize.y;
-	float right  = (frame.left + frame.width) / texSize.x;
-	float bottom = (frame.top + frame.height) / texSize.y;
+	float left   = rect.left;
+	float top    = rect.top;
+	float right  = rect.left + rect.width;
+	float bottom = rect.top + rect.height;
 
 	vertices[0].u = left;
 	vertices[0].v = top;
@@ -108,24 +104,22 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 	std::vector<Vertex2D> vertices(static_cast<std::size_t>(duration * 4));
 
-	const glm::vec2 texSize{ pTexture->getSize() };
-	float frameWidth = texSize.x / duration;
+	const auto& texSize = pTexture->getSize();
+	int frameWidth = texSize.x / duration;
 
 	for (std::size_t i = 0; i < vertices.size(); i += 4)
 	{
 		Vertex2D* quad = &vertices[i];
 
-		quad[1].x = frameWidth;
-		quad[2].x = frameWidth;
-		quad[2].y = texSize.y;
-		quad[3].y = texSize.y;
+		quad[1].x = static_cast<float>(frameWidth);
+		quad[2].x = static_cast<float>(frameWidth);
+		quad[2].y = static_cast<float>(texSize.y);
+		quad[3].y = static_cast<float>(texSize.y);
 
-		float offset = i * frameWidth;
-
-		float left   = offset / texSize.x;
+		float left   = static_cast<float>(i * frameWidth);
 		float top    = 0.0f;
-		float right  = (offset + frameWidth) / texSize.x;
-		float bottom = 1.0f;
+		float right  = static_cast<float>(left + frameWidth);
+		float bottom = static_cast<float>(texSize.y);
 
 		quad[0].u = left;
 		quad[0].v = top;
@@ -169,28 +163,25 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 	std::vector<Vertex2D> vertices(static_cast<std::size_t>(columns * rows * 4));
 
-	const glm::vec2 texSize{ pTexture->getSize() };
+	const auto& texSize = pTexture->getSize();
 
-	float frameWidth  = texSize.x / columns;
-	float frameHeight = texSize.y / rows;
+	int frameWidth  = texSize.x / columns;
+	int frameHeight = texSize.y / rows;
 
 	for (int y = 0; y < rows; ++y)
 		for (int x = 0; x < columns; ++x)
 		{
 			Vertex2D* quad = &vertices[static_cast<std::size_t>(y * columns + x) * 4];
 
-			quad[1].x = frameWidth;
-			quad[2].x = frameWidth;
-			quad[2].y = frameHeight;
-			quad[3].y = frameHeight;
+			quad[1].x = static_cast<float>(frameWidth);
+			quad[2].x = static_cast<float>(frameWidth);
+			quad[2].y = static_cast<float>(frameHeight);
+			quad[3].y = static_cast<float>(frameHeight);
 
-			float offsetX = x * frameWidth;
-			float offsetY = y * frameHeight;
-
-			float left = offsetX / texSize.x;
-			float top = offsetY / texSize.y;
-			float right = (offsetX + frameWidth) / texSize.x;
-			float bottom = (offsetY + frameHeight) / texSize.y;
+			float left   = x * frameWidth;
+			float top    = y * frameHeight;
+			float right  = left + frameWidth;
+			float bottom = top + frameHeight;
 
 			quad[0].u = left;
 			quad[0].v = top;
@@ -267,7 +258,7 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 
 		auto pCutNode = pAnimNode->first_node("cut");
 
-		std::vector<FloatRect> frames;
+		std::vector<IntRect> frames;
 
 		while (pCutNode)
 		{
@@ -276,10 +267,10 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 			auto pW = pCutNode->first_attribute("w");
 			auto pH = pCutNode->first_attribute("h");
 
-			float x = pX ? ceilf(atof(pX->value())) : 0.0f;
-			float y = pY ? ceilf(atof(pY->value())) : 0.0f;
-			float w = pW ? ceilf(atof(pW->value())) : 0.0f;
-			float h = pH ? ceilf(atof(pH->value())) : 0.0f;
+			int x = pX ? atoi(pX->value()) : 0;
+			int y = pY ? atoi(pY->value()) : 0;
+			int w = pW ? atoi(pW->value()) : 0;
+			int h = pH ? atoi(pH->value()) : 0;
 
 			frames.emplace_back(x, y, w, h);
 			pAnim->duration++;
@@ -292,21 +283,21 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 
 		std::vector<Vertex2D> vertices(frames.size() * 4);
 
-		auto createVerticesFromFrame = [](const Texture2D* pTexture, const FloatRect& frame, std::vector<Vertex2D>& vec, std::size_t stride)
+		auto createVerticesFromFrame = [](const Texture2D* pTexture, const IntRect& frame, std::vector<Vertex2D>& vec, std::size_t stride)
 		{
 			Vertex2D* quad = &vec[stride * 4];
 
-			quad[1].x = frame.width;
-			quad[2].x = frame.width;
-			quad[2].y = frame.height;
-			quad[3].y = frame.height;
+			quad[1].x = static_cast<float>(frame.width);
+			quad[2].x = static_cast<float>(frame.width);
+			quad[2].y = static_cast<float>(frame.height);
+			quad[3].y = static_cast<float>(frame.height);
 
-			const glm::vec2 texSize{ pTexture->getSize() };
+			const auto& texSize = pTexture->getSize();
 
-			float left   = frame.left / texSize.x;
-			float top    = frame.top / texSize.y;
-			float right  = (frame.left + frame.width) / texSize.x;
-			float bottom = (frame.top + frame.height) / texSize.y;
+			float left   = static_cast<float>(frame.left);
+			float top    = static_cast<float>(frame.top);
+			float right  = static_cast<float>(frame.left + frame.width);
+			float bottom = static_cast<float>(frame.top + frame.height);
 
 			quad[0].u = left;
 			quad[0].v = top;
@@ -346,24 +337,21 @@ const AnimationManager::SpriteSheet* AnimationManager::getSpriteSheet(const std:
     return (found != m_pInstance->m_spriteSheets.end()) ? &found->second : nullptr;
 }
 
-void AnimationManager::unloadOnGPU(const Vertex2D* vertices, Animation& pAnim) noexcept
+void AnimationManager::unloadOnGPU(const Vertex2D* vertices, Animation& anim) noexcept
 {
-	glGenVertexArrays(1, &pAnim.vao);
-	glGenBuffers(1, &pAnim.vbo);
+	glGenVertexArrays(1, &anim.vao);
+	glGenBuffers(1, &anim.vbo);
 
-	glBindVertexArray(pAnim.vao);
+	glBindVertexArray(anim.vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, pAnim.vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * pAnim.duration * 4, vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, anim.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * anim.duration * 4, vertices, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
 	glEnableVertexAttribArray(0);
 
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, u));
 	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, color));
-	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

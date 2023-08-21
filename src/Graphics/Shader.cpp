@@ -122,6 +122,12 @@ void Shader::setUniform(int loc, const glm::mat4& matrix) noexcept
         glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
+void Shader::setUniform(int loc, const float* matrix) noexcept
+{
+    if (loc != -1)
+        glUniformMatrix4fv(loc, 1, GL_FALSE, matrix);
+}
+
 void Shader::checkCompileErrors(GLuint shader, std::string type)
 {
     int success;
