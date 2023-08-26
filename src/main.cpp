@@ -10,7 +10,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Graphics/Shader.hpp"
+#include "Graphics/Sprite.hpp"
+
 #include "Managers/AssetManager.hpp"
+#include "Managers/SpriteManager.hpp"
+
 #include "World/TileMap.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
@@ -66,6 +70,14 @@ int main()
 #endif
 
     AssetManager al;
+    SpriteManager sm;
+
+    sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 30);
+    sm.unloadOnGPU();
+
+    Sprite sprite;
+    sprite.setTexture(AssetManager::get<Texture2D>("Explosion.png")->texture);
+    sprite.setFrame(0);
 
     Shader* shader = AssetManager::get<Shader>("TileMapShader", "tilemap.vert", "tilemap.frag");
     Shader::bind(shader);
@@ -84,6 +96,9 @@ int main()
 
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+    int counter = 0;
+    int frameNum = 0;
 
     TimeStamp timestamp = Clock::now();
 
@@ -118,6 +133,21 @@ int main()
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
         tm.draw();
+
+        if(++counter > 2)
+        {
+            counter  = 0;
+            frameNum++;
+
+            if(frameNum >= 48)
+                frameNum = 0;
+
+            sprite.setFrame(frameNum);
+        }
+
+        sm.bind();
+        sprite.draw();
+        sm.unbind();
 
         glfwSwapBuffers(window);
         glfwPollEvents();      

@@ -9,8 +9,7 @@
 
 SpriteManager::SpriteManager() noexcept:
 	m_vao(0), 
-	m_vbo(0),
-	m_amountOfSprites(0)
+	m_vbo(0)
 {
 }
 
@@ -38,8 +37,10 @@ bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTextu
 
 	auto& anim      = it.first->second;
 	anim.pTexture   = pTexture;
-	anim.startFrame = createVerticesFromFrame(frame, ratio);
+	anim.startFrame = m_vertexBuffer.size() >> 2; 
 	anim.duration   = 1;
+
+	createVerticesFromFrame(frame, ratio);
 
 	return true;
 }
@@ -61,7 +62,7 @@ bool SpriteManager::createLinearAnimaton(const std::string &name, const Texture2
 
 	auto& anim      = it.first->second;
 	anim.pTexture   = pTexture;
-	anim.startFrame = m_amountOfSprites;
+	anim.startFrame = m_vertexBuffer.size() >> 2;
 	anim.duration   = duration;
 	anim.fps        = fps;
 	anim.delay      = delay;
@@ -92,7 +93,7 @@ bool SpriteManager::createGridAnimaton(const std::string &name, const Texture2D 
 
 	auto& anim      = it.first->second;
 	anim.pTexture   = pTexture;
-	anim.startFrame = m_amountOfSprites;
+	anim.startFrame = m_vertexBuffer.size() >> 2;
 	anim.duration   = columns * rows;
 	anim.fps        = fps;
 	anim.delay      = delay;
@@ -157,7 +158,7 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
 		auto pDelay = pAnimNode->first_attribute("delay");
 
 		pAnim->pTexture   = pTexture;
-		pAnim->startFrame = m_amountOfSprites;
+		pAnim->startFrame = m_vertexBuffer.size() >> 2;
 		pAnim->delay      = pDelay ? std::atoi(pDelay->value()) * 0.001f : 1.0f; // Convert milliseconds to seconds
 		pAnim->fps        = 1.0f / pAnim->delay; // The number of frames shown per second
 
@@ -252,20 +253,16 @@ void SpriteManager::release() noexcept
 		glDeleteBuffers(1, &m_vbo);
 		m_vbo = 0;
 	}
-
-	m_amountOfSprites = 0;
 }
 
-unsigned SpriteManager::createVerticesFromFrame(const IntRect &frame, const Vector2f &ratio) noexcept
+void SpriteManager::createVerticesFromFrame(const IntRect &frame, const Vector2f &ratio) noexcept
 {
-	unsigned spriteNum = m_amountOfSprites++;
-
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 
-	Vertex2D* quad = &m_vertexBuffer[(spriteNum << 2)];
+	Vertex2D* quad = &m_vertexBuffer[m_vertexBuffer.size() - 4];
 
 	quad[1].position.x = static_cast<float>(frame.width);
 	quad[2].position.x = static_cast<float>(frame.width);
@@ -288,6 +285,4 @@ unsigned SpriteManager::createVerticesFromFrame(const IntRect &frame, const Vect
 
 	quad[3].texCoords.x = left;
 	quad[3].texCoords.y = bottom;
-
-	return spriteNum;
 }

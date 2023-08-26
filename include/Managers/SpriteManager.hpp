@@ -44,7 +44,7 @@ public:
 	void release()     noexcept;
 
 private:
-	unsigned createVerticesFromFrame(const IntRect& frame, const Vector2f& ratio) noexcept;
+	void createVerticesFromFrame(const IntRect& frame, const Vector2f& ratio) noexcept;
 
 private:
 	std::unordered_map<std::string, Animation2D> m_animations;
@@ -55,7 +55,6 @@ private:
 
 	unsigned m_vao;
 	unsigned m_vbo;
-	unsigned m_amountOfSprites;
 };
 
 #endif

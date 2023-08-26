@@ -5,13 +5,16 @@ class Sprite
 {
 public:
 	Sprite() noexcept;
-	~Sprite();
+	~Sprite() = default;
 
-	void draw(const class Shader* shader) noexcept;
+	void setTexture(unsigned texture) noexcept;
+	void setFrame(unsigned frameNum) noexcept;
+
+	void draw() noexcept;
 
 private:
-	const class Animation* m_pAnimation;
+	unsigned m_texture;
+	unsigned m_frame;
 };
-
 
 #endif 
