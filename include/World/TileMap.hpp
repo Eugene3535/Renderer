@@ -5,10 +5,9 @@
 #include <vector>
 #include <memory>
 
-#include <glm/glm.hpp>
-
 #include "rapidxml.hpp"
 
+#include "Geometry/Vector2.hpp"
 #include "Geometry/Vertex2D.hpp"
 
 class TileMap
@@ -28,8 +27,9 @@ public:
 	{
 		struct TileLayer
 		{
-			std::vector<Vertex2D> vertices; 
+			std::vector<Vertex2D>      vertices; 
 			std::vector<std::uint32_t> indices;
+
 			class Texture2D* pTexture = nullptr;
 			std::uint32_t vao = 0;
 			std::uint32_t vbo = 0;
@@ -54,8 +54,8 @@ public:
 
 		std::vector<Property> properties;
 
-		glm::ivec2 position;
-		glm::ivec2 size;
+		Vector2u position;
+		Vector2u size;
 	};
 
 public:
@@ -69,9 +69,9 @@ public:
 	std::vector<const Object*>    getObjectsByName(const std::string&) const noexcept;
 	std::vector<const Object*>    getObjectsByType(const std::string&) const noexcept;
 
-	const glm::uvec2& getMapSizeInTiles()  const noexcept;
-	glm::uvec2        getMapSizeInPixels() const noexcept;
-	const glm::uvec2& getTileSize()        const noexcept;
+	const Vector2u& getMapSizeInTiles()  const noexcept;
+	Vector2u        getMapSizeInPixels() const noexcept;
+	const Vector2u& getTileSize()        const noexcept;
 
 	void draw(const std::uint32_t shader) noexcept;
 	
@@ -90,8 +90,8 @@ private:
 	std::vector<Object>    m_objects;
 	std::string            m_name;
 	std::string            m_collisionMask;	
-	glm::uvec2             m_mapSize;
-	glm::uvec2             m_tileSize;
+	Vector2u               m_mapSize;
+	Vector2u               m_tileSize;
 };
 
 #endif

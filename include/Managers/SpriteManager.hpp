@@ -7,8 +7,10 @@
 
 #include "Geometry/Vertex2D.hpp"
 #include "Geometry/Rect.hpp"
+#include "Managers/Base/Manager.hpp"
 
-class SpriteManager
+class SpriteManager:
+	public Manager
 {
 public:
 	struct Animation2D

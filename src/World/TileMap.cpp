@@ -52,10 +52,7 @@ bool TileMap::loadFromFile(const std::string& filename) noexcept
 
 	m_name = filename;
 
-	if( ! loadTilePlanes(pMapNode) )
-		return false;
-
-	return true;
+	return (loadTilePlanes(pMapNode) && loadObjects(pMapNode));
 }
 
 const std::vector<TileMap::TilePlane>& TileMap::getTilePlanes() const noexcept
@@ -90,17 +87,17 @@ std::vector<const TileMap::Object*> TileMap::getObjectsByType(const std::string&
 	return objects;
 }
 
-const glm::uvec2& TileMap::getMapSizeInTiles()  const noexcept
+const Vector2u& TileMap::getMapSizeInTiles()  const noexcept
 {
 	return m_mapSize;
 }
 
-glm::uvec2 TileMap::getMapSizeInPixels() const noexcept
+Vector2u TileMap::getMapSizeInPixels() const noexcept
 {
-	return glm::uvec2(m_mapSize.x * m_tileSize.x, m_mapSize.y * m_tileSize.y);
+	return { m_mapSize.x * m_tileSize.x, m_mapSize.y * m_tileSize.y };
 }
 
-const glm::uvec2& TileMap::getTileSize() const noexcept
+const Vector2u& TileMap::getTileSize() const noexcept
 {
 	return m_tileSize;
 }
@@ -144,8 +141,8 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 		return false;
 #endif
 
-	m_mapSize = glm::ivec2(map_width, map_height);
-	m_tileSize = glm::ivec2(tile_width, tile_height);
+	m_mapSize  = Vector2u(map_width, map_height);
+	m_tileSize = Vector2u(tile_width, tile_height);
 
 	for (auto pLayerNode = pMapNode->first_node("layer");
 		pLayerNode != nullptr;
@@ -283,12 +280,12 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
 
 			for (auto pAttr = pObjectNode->first_attribute(); pAttr != nullptr; pAttr = pAttr->next_attribute())
 			{
-				if (strcmp(pAttr->name(), "x") == 0)      { tme_object.position.x = static_cast<float>(std::atof(pAttr->value())); continue; }
-				if (strcmp(pAttr->name(), "y") == 0)      { tme_object.position.y = static_cast<float>(std::atof(pAttr->value())); continue; }
-				if (strcmp(pAttr->name(), "width") == 0)  { tme_object.size.x     = static_cast<float>(std::atof(pAttr->value())); continue; }
-				if (strcmp(pAttr->name(), "height") == 0) { tme_object.size.x     = static_cast<float>(std::atof(pAttr->value())); continue; }
+				if (strcmp(pAttr->name(), "x")      == 0) { tme_object.position.x = std::strtol(pAttr->value(), nullptr, 10); continue; }
+				if (strcmp(pAttr->name(), "y")      == 0) { tme_object.position.y = std::strtol(pAttr->value(), nullptr, 10); continue; }
+				if (strcmp(pAttr->name(), "width")  == 0) { tme_object.size.x     = std::strtol(pAttr->value(), nullptr, 10); continue; }
+				if (strcmp(pAttr->name(), "height") == 0) { tme_object.size.y     = std::strtol(pAttr->value(), nullptr, 10); continue; }
 
-				if (strcmp(pAttr->name(), "name") == 0)  tme_object.name = pAttr->value();
+				if (strcmp(pAttr->name(), "name")  == 0) tme_object.name = pAttr->value();
 				if (strcmp(pAttr->name(), "class") == 0) tme_object.type = pAttr->value();
 			}
 
@@ -302,9 +299,9 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
 
 					for (auto pAttr = pPropertyNode->first_attribute(); pAttr != nullptr; pAttr = pAttr->next_attribute())
 					{
-						if (strcmp(pAttr->name(), "name") == 0) { prop.name = pAttr->value(); continue; }
-						if (strcmp(pAttr->name(), "type") == 0) { prop.type = pAttr->value(); continue; }
-						if (strcmp(pAttr->name(), "value") == 0)  prop.value = pAttr->value();
+						if (strcmp(pAttr->name(), "name")  == 0) { prop.name  = pAttr->value(); continue; }
+						if (strcmp(pAttr->name(), "type")  == 0) { prop.type  = pAttr->value(); continue; }
+						if (strcmp(pAttr->name(), "value") == 0)   prop.value = pAttr->value();
 					}
 				}
 			}

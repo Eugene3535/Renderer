@@ -8,8 +8,10 @@
 #include "Utils/Files.hpp"
 #include "Graphics/Texture2D.hpp"
 #include "Graphics/Shader.hpp"
+#include "Managers/Base/Manager.hpp"
 
-class AssetManager
+class AssetManager:
+    public Manager
 {
 public:
     AssetManager() noexcept;
@@ -89,13 +91,13 @@ private:
                     if(!LoadImageFromFile(filepath, pixels, texture.width, texture.height))
                     {
                         container.erase(filename);
-
-                        return nullptr;
                     }
+                    else
+                    {
+                        CreateTextureFromImage(pixels, texture);
 
-                    CreateTextureFromImage(pixels, texture);
-
-                    return &texture;
+                        return &texture;
+                    }
                 }
             }
         }
