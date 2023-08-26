@@ -2,18 +2,16 @@
 #include <vector>
 
 #include "Utils/Defines.hpp"
-#include "Geometry/FastMath.hpp"
+#include "Geometry/FastSinCos.hpp"
 
-float FastMath::sine(float angle)
+float FastSinCos::sine(int angle)
 {
-#ifdef DEBUG
-    if( angle > 359.0f || angle < 0.0f)
-        return 0.0f;
-#endif
+    if( angle > 359 || angle < 0)
+        return 0;
 
     static std::vector<float> table;
 
-    if (table.empty())
+    if (table.empty()) // First call only
     {
         table.resize(360, 0.0f);
 
@@ -21,19 +19,17 @@ float FastMath::sine(float angle)
             table[i] = sinf(static_cast<float>(i) * DEGTORAD);
     }
 
-    return table[static_cast<std::size_t>(angle)];
+    return table[angle];
 }
 
-float FastMath::cosine(float angle)
+float FastSinCos::cosine(int angle)
 {
-#ifdef DEBUG
-    if( angle > 359.0f || angle < 0.0f)
-        return 0.0f;
-#endif
+    if( angle > 359 || angle < 0)
+        return 0;
 
     static std::vector<float> table;
 
-    if (table.empty())
+    if (table.empty()) // First call only
     {
         table.resize(360, 0.0f);
 
@@ -41,5 +37,5 @@ float FastMath::cosine(float angle)
             table[i] = cosf(static_cast<float>(i) * DEGTORAD);
     }
 
-    return table[static_cast<std::size_t>(angle)];
+    return table[angle];
 }

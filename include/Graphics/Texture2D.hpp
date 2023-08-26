@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <glm/glm.hpp>
+#include "Geometry/Vector2.hpp"
 
 class Texture2D
 {
@@ -23,14 +23,14 @@ public:
     void setRepeated(bool repeat) noexcept;
     void setSmooth(bool smooth)   noexcept;
 
-    bool isRepeated()           const noexcept;
-    bool isSmooth()             const noexcept;
-    const glm::ivec2& getSize() const noexcept;
-    unsigned getHandle()        const noexcept;
+    bool isRepeated()         const noexcept;
+    bool isSmooth()           const noexcept;
+    const Vector2i& getSize() const noexcept;
+    unsigned getHandle()      const noexcept;
 
 private:
-    glm::ivec2 m_size;
-    unsigned   m_handle;
+    Vector2i m_size;
+    unsigned m_handle;
 
     bool m_isRepeated;
     bool m_isSmooth;

@@ -28,7 +28,7 @@ bool Image::loadFromFile(const std::string& filepath) noexcept
     return true;
 }
 
-const glm::ivec2& Image::getSize() const noexcept
+const Vector2i& Image::getSize() const noexcept
 {
     return m_size;
 }

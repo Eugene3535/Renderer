@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <glad/glad.h>
 #include "rapidxml_ext.h"
 #include "rapidxml_utils.hpp"
@@ -5,7 +7,7 @@
 #include "Managers/AnimationManager.hpp"
 #include "Utils/Files.hpp"
 #include "Graphics/Texture2D.hpp"
-#include "Graphics/Vertex2D.hpp"
+#include "Geometry/Vertex2D.hpp"
 
 AnimationManager* AnimationManager::m_pInstance;
 
@@ -55,27 +57,31 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 	Vertex2D vertices[4]{};
 
-	vertices[1].x = static_cast<float>(rect.width);
-	vertices[2].x = static_cast<float>(rect.width);
-	vertices[2].y = static_cast<float>(rect.height);
-	vertices[3].y = static_cast<float>(rect.height);
+	vertices[1].position.x = static_cast<float>(rect.width);
+	vertices[2].position.x = static_cast<float>(rect.width);
+	vertices[2].position.y = static_cast<float>(rect.height);
+	vertices[3].position.y = static_cast<float>(rect.height);
 
-	float left   = rect.left;
-	float top    = rect.top;
-	float right  = rect.left + rect.width;
-	float bottom = rect.top + rect.height;
+	const auto& texSize = pTexture->getSize();
+	float ratioX = 1.0f / texSize.x;
+	float ratioY = 1.0f / texSize.y;
 
-	vertices[0].u = left;
-	vertices[0].v = top;
+	float left   = rect.left * ratioX;
+	float top    = rect.top * ratioY;
+	float right  = (rect.left + rect.width) * ratioX;
+	float bottom = (rect.top + rect.height) * ratioY;
 
-	vertices[1].u = right;
-	vertices[1].v = top;
+	vertices[0].texCoords.x = left;
+	vertices[0].texCoords.y = top;
 
-	vertices[2].u = right;
-	vertices[2].v = bottom;
+	vertices[1].texCoords.x = right;
+	vertices[1].texCoords.y = top;
 
-	vertices[3].u = left;
-	vertices[3].v = bottom;
+	vertices[2].texCoords.x = right;
+	vertices[2].texCoords.y = bottom;
+
+	vertices[3].texCoords.x = left;
+	vertices[3].texCoords.y = bottom;
 
 	anim.pTexture = pTexture;
 	anim.duration = 1;
@@ -106,32 +112,34 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 	const auto& texSize = pTexture->getSize();
 	int frameWidth = texSize.x / duration;
+	float ratioX = 1.0f / texSize.x;
+	float ratioY = 1.0f / texSize.y;
 
 	for (std::size_t i = 0; i < vertices.size(); i += 4)
 	{
 		Vertex2D* quad = &vertices[i];
 
-		quad[1].x = static_cast<float>(frameWidth);
-		quad[2].x = static_cast<float>(frameWidth);
-		quad[2].y = static_cast<float>(texSize.y);
-		quad[3].y = static_cast<float>(texSize.y);
+		quad[1].position.x = static_cast<float>(frameWidth);
+		quad[2].position.x = static_cast<float>(frameWidth);
+		quad[2].position.y = static_cast<float>(texSize.y);
+		quad[3].position.y = static_cast<float>(texSize.y);
 
-		float left   = static_cast<float>(i * frameWidth);
+		float left   = i * frameWidth * ratioX;
 		float top    = 0.0f;
-		float right  = static_cast<float>(left + frameWidth);
-		float bottom = static_cast<float>(texSize.y);
+		float right  = (left + static_cast<float>(frameWidth)) * ratioX;
+		float bottom = 1.0f;
 
-		quad[0].u = left;
-		quad[0].v = top;
+		quad[0].texCoords.x = left;
+		quad[0].texCoords.y = top;
 
-		quad[1].u = right;
-		quad[1].v = top;
+		quad[1].texCoords.x = right;
+		quad[1].texCoords.y = top;
 
-		quad[2].u = right;
-		quad[2].v = bottom;
+		quad[2].texCoords.x = right;
+		quad[2].texCoords.y = bottom;
 
-		quad[3].u = left;
-		quad[3].v = bottom;
+		quad[3].texCoords.x = left;
+		quad[3].texCoords.y = bottom;
 	}
 
 	anim.pTexture = pTexture;
@@ -167,33 +175,35 @@ const Animation* AnimationManager::create(const char* name, const Texture2D* pTe
 
 	int frameWidth  = texSize.x / columns;
 	int frameHeight = texSize.y / rows;
+	float ratioX = 1.0f / texSize.x;
+	float ratioY = 1.0f / texSize.y;
 
 	for (int y = 0; y < rows; ++y)
 		for (int x = 0; x < columns; ++x)
 		{
 			Vertex2D* quad = &vertices[static_cast<std::size_t>(y * columns + x) * 4];
 
-			quad[1].x = static_cast<float>(frameWidth);
-			quad[2].x = static_cast<float>(frameWidth);
-			quad[2].y = static_cast<float>(frameHeight);
-			quad[3].y = static_cast<float>(frameHeight);
+			quad[1].position.x = static_cast<float>(frameWidth);
+			quad[2].position.x = static_cast<float>(frameWidth);
+			quad[2].position.y = static_cast<float>(frameHeight);
+			quad[3].position.y = static_cast<float>(frameHeight);
 
-			float left   = x * frameWidth;
-			float top    = y * frameHeight;
-			float right  = left + frameWidth;
-			float bottom = top + frameHeight;
+			float left   = x * frameWidth * ratioX;
+			float top    = y * frameHeight * ratioY;
+			float right  = (left + frameWidth) * ratioX;
+			float bottom = (top + frameHeight) * ratioY;
 
-			quad[0].u = left;
-			quad[0].v = top;
+			quad[0].texCoords.x = left;
+			quad[0].texCoords.y = top;
 
-			quad[1].u = right;
-			quad[1].v = top;
+			quad[1].texCoords.x = right;
+			quad[1].texCoords.y = top;
 
-			quad[2].u = right;
-			quad[2].v = bottom;
+			quad[2].texCoords.x = right;
+			quad[2].texCoords.y = bottom;
 
-			quad[3].u = left;
-			quad[3].v = bottom;
+			quad[3].texCoords.x = left;
+			quad[3].texCoords.y = bottom;
 		}
 
 	anim.pTexture = pTexture;
@@ -283,37 +293,38 @@ const AnimationManager::SpriteSheet* AnimationManager::loadSpriteSheet(const std
 
 		std::vector<Vertex2D> vertices(frames.size() * 4);
 
-		auto createVerticesFromFrame = [](const Texture2D* pTexture, const IntRect& frame, std::vector<Vertex2D>& vec, std::size_t stride)
+		float ratioX = 1.0f / pTexture->getSize().x;
+		float ratioY = 1.0f / pTexture->getSize().y;
+
+		auto createVerticesFromFrame = [ratioX, ratioY, &vertices](const IntRect& frame, std::size_t stride)
 		{
-			Vertex2D* quad = &vec[stride * 4];
+			Vertex2D* quad = &vertices[stride * 4];
 
-			quad[1].x = static_cast<float>(frame.width);
-			quad[2].x = static_cast<float>(frame.width);
-			quad[2].y = static_cast<float>(frame.height);
-			quad[3].y = static_cast<float>(frame.height);
+			quad[1].position.x = static_cast<float>(frame.width);
+			quad[2].position.x = static_cast<float>(frame.width);
+			quad[2].position.y = static_cast<float>(frame.height);
+			quad[3].position.y = static_cast<float>(frame.height);
 
-			const auto& texSize = pTexture->getSize();
+			float left   = frame.left * ratioX;
+			float top    = frame.top * ratioY;
+			float right  = (frame.left + frame.width) * ratioX;
+			float bottom = (frame.top + frame.height) * ratioY;
 
-			float left   = static_cast<float>(frame.left);
-			float top    = static_cast<float>(frame.top);
-			float right  = static_cast<float>(frame.left + frame.width);
-			float bottom = static_cast<float>(frame.top + frame.height);
+			quad[0].texCoords.x = left;
+			quad[0].texCoords.y = top;
 
-			quad[0].u = left;
-			quad[0].v = top;
+			quad[1].texCoords.x = right;
+			quad[1].texCoords.y = top;
 
-			quad[1].u = right;
-			quad[1].v = top;
+			quad[2].texCoords.x = right;
+			quad[2].texCoords.y = bottom;
 
-			quad[2].u = right;
-			quad[2].v = bottom;
-
-			quad[3].u = left;
-			quad[3].v = bottom;
+			quad[3].texCoords.x = left;
+			quad[3].texCoords.y = bottom;
 		};
 
 		for (std::size_t i = 0; i < frames.size(); ++i)	
-			createVerticesFromFrame(pTexture, frames[i], vertices, i);
+			createVerticesFromFrame(frames[i], i);
 		
 		unloadOnGPU(vertices.data(), *pAnim);
 
@@ -350,7 +361,7 @@ void AnimationManager::unloadOnGPU(const Vertex2D* vertices, Animation& anim) no
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, u));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, texCoords));
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

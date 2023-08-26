@@ -111,7 +111,7 @@ bool Texture2D::isSmooth() const noexcept
     return m_isSmooth;
 }
 
-const glm::ivec2& Texture2D::getSize() const noexcept
+const Vector2i& Texture2D::getSize() const noexcept
 {
     return m_size;
 }

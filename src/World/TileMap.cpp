@@ -13,7 +13,7 @@
 
 #include "Utils/Files.hpp"
 #include "Utils/Defines.hpp"
-
+#include "Geometry/Vector2.hpp"
 #include "Managers/AssetManager.hpp"
 
 TileMap::TileMap() noexcept:
@@ -214,18 +214,26 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 					float ratioX = 1.0f / pLayer->pTexture->getSize().x;
 					float ratioY = 1.0f / pLayer->pTexture->getSize().y;
 
+//                  Texture coords
 					float left = offsetX * ratioX;
 					float top = offsetY * ratioY;
 					float right = (offsetX + tile_width) * ratioX;
 					float bottom = (offsetY + tile_height) * ratioY;
 
+//                  Vertex coords
+					Vector2f leftBottom  = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height + tile_height) };
+					Vector2f rightBootom = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height + tile_height) };
+					Vector2f rightTop    = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height) };
+					Vector2f leftTop     = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height) };
+
+//                  Index stride
 					std::uint32_t index = static_cast<std::uint32_t>(pLayer->vertices.size());
 
 					// Quad
-					pLayer->vertices.emplace_back(x * tile_width, y * tile_height + tile_height, left, bottom);
-					pLayer->vertices.emplace_back(x * tile_width + tile_width, y * tile_height + tile_height, right, bottom);
-					pLayer->vertices.emplace_back(x * tile_width + tile_width, y * tile_height, right, top);
-					pLayer->vertices.emplace_back(x * tile_width, y * tile_height, left, top);
+					pLayer->vertices.emplace_back(leftBottom.x, leftBottom.y, left, bottom);
+					pLayer->vertices.emplace_back(rightBootom.x, rightBootom.y, right, bottom);
+					pLayer->vertices.emplace_back(rightTop.x, rightTop.y, right, top);
+					pLayer->vertices.emplace_back(leftTop.x, leftTop.y, left, top);
 
 					// 1-st triangle
 					pLayer->indices.push_back(index);
@@ -383,7 +391,7 @@ void TileMap::unloadOnGPU(TileMap::TilePlane::TileLayer& layer) noexcept
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, u));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, texCoords));
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);

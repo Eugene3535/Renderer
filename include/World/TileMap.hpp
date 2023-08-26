@@ -9,7 +9,7 @@
 
 #include "rapidxml.hpp"
 
-#include "Graphics/Vertex2D.hpp"
+#include "Geometry/Vertex2D.hpp"
 
 class TileMap
 {

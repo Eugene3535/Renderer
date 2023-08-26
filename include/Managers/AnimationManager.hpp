@@ -5,8 +5,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "Utils/Defines.hpp"
-#include "Utils/Rect.hpp"
+#include "Geometry/Rect.hpp"
 
 struct Animation
 {

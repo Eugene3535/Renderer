@@ -1,5 +1,5 @@
+#include "Geometry/FastSinCos.hpp"
 #include "Geometry/Transform2D.hpp"
-#include <cmath>
 
 static constexpr float factor = 3.141592654f / 180.f;
 
@@ -125,8 +125,8 @@ const float* Transform2D::getTransform() noexcept
     if (m_transformNeedUpdate)
     {
         float angle  = -m_rotation * factor;
-        float cosine = std::cosf(angle);
-        float sine   = std::sinf(angle);
+        float cosine = FastSinCos::cosine(angle);
+        float sine   = FastSinCos::sine(angle);
         float sxc    = m_scale.x * cosine;
         float syc    = m_scale.y * cosine;
         float sxs    = m_scale.x * sine;
@@ -145,11 +145,11 @@ const float* Transform2D::getTransform() noexcept
 }
 
 void Transform2D::setTransform(float a00, float a01, float a02,
-                          float a10, float a11, float a12,
-                          float a20, float a21, float a22) noexcept
+                               float a10, float a11, float a12,
+                               float a20, float a21, float a22) noexcept
 {
-    m_matrix[0] = a00; m_matrix[4] = a01; m_matrix[8] = 0.f; m_matrix[12] = a02;
-    m_matrix[1] = a10; m_matrix[5] = a11; m_matrix[9] = 0.f; m_matrix[13] = a12;
+    m_matrix[0] = a00; m_matrix[4] = a01; m_matrix[8] = 0.f;  m_matrix[12] = a02;
+    m_matrix[1] = a10; m_matrix[5] = a11; m_matrix[9] = 0.f;  m_matrix[13] = a12;
     m_matrix[2] = 0.f; m_matrix[6] = 0.f; m_matrix[10] = 1.f; m_matrix[14] = 0.f;
     m_matrix[3] = a20; m_matrix[7] = a21; m_matrix[11] = 0.f; m_matrix[15] = a22;
 }

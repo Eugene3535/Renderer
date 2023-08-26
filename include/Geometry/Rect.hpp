@@ -30,7 +30,7 @@ public:
     T height; ///< Height of the rectangle
 };
 
-#include "Utils/Rect.inl"
+#include "Geometry/Rect.inl"
 
 using IntRect = Rect<int>;
 using FloatRect = Rect<float> ;

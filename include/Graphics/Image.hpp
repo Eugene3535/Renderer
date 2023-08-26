@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <glm/glm.hpp>
+#include "Geometry/Vector2.hpp"
 
 class Image
 {
@@ -18,13 +18,13 @@ public:
 
     bool loadFromFile(const std::string& filepath) noexcept;
 
-    const glm::ivec2&   getSize() const noexcept;
+    const Vector2i&     getSize() const noexcept;
     const std::uint8_t* getData() const noexcept;
 
 private:
     std::vector<std::uint8_t> m_pixels;
 
-    glm::ivec2 m_size;
+    Vector2i m_size;
 };
 
 #endif
