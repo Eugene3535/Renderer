@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <type_traits>
 
+#include <glad/glad.h>
+
 #include "Utils/Files.hpp"
 #include "Graphics/Texture2D.hpp"
 #include "Graphics/Shader.hpp"
@@ -108,15 +110,12 @@ private:
             if (result)
             {
                 auto shader = &iterator->second;
+                shader->m_program = glCreateProgram();
 
-                if (!iterator->second.compile(std::forward<Args>(args)...))
-                {
+                if (!shader->compile(std::forward<Args>(args)...))          
                     container.erase(filename);
-
-                    return nullptr;
-                }
-
-                return &iterator->second;
+                else
+                    return shader;
             }
         }
 

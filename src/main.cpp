@@ -68,7 +68,7 @@ int main()
     AssetManager al;
 
     Shader* shader = AssetManager::get<Shader>("TileMapShader", "tilemap.vert", "tilemap.frag");
-    shader->bind();
+    Shader::bind(shader);
 
     TileMap tm;
     tm.loadFromFile("TestMap.tmx");
@@ -82,9 +82,8 @@ int main()
     GLint projLoc = shader->getUniformLocation("projection");
     GLint viewLoc = shader->getUniformLocation("view");
 
-    shader->setUniform(projLoc, projection);
-    shader->setUniform(viewLoc, view);
-
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
     TimeStamp timestamp = Clock::now();
 
@@ -114,11 +113,11 @@ int main()
         if(IsKeyPressed(window, GLFW_KEY_S))
             view = glm::translate(view,glm::vec3(0, -3, 0) );
 
-        shader->bind();
+        Shader::bind(shader);
 
-        shader->setUniform(viewLoc, view);
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-        tm.draw(shader->getHandle());
+        tm.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();      

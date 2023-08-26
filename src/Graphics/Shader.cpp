@@ -2,155 +2,133 @@
 #include "Utils/Files.hpp"
 
 #include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
 
-#include <fstream>
-#include <sstream>
 #include <iostream>
+#include <cstdio>
 
 Shader::Shader() noexcept: 
-    m_handle(0)
+    m_program(0u)
 {
-    m_handle = glCreateProgram();
-
-    setUniform1i = glUniform1i;
-    setUniform1f = glUniform1f;
-    setUniform2f = glUniform2f;
-    setUniform3f = glUniform3f;
-    setUniform4f = glUniform4f;
-}
-
-Shader::~Shader()
-{
-    glDeleteProgram(m_handle);
 }
 
 bool Shader::compile(const std::string &filename, unsigned type) noexcept
 {
+    if(!m_program)
+        return false;
+
     const std::string filepath = FileUtils::getPathToFile(filename);
 
-    if (filepath.empty())
+    if(filepath.empty())
         return false;
 
-    std::string source;
-    std::ifstream ifs_stream;
+    std::string source = readShaderSourceFromFile(filepath);
 
-    ifs_stream.open(filepath);
-
-    if (ifs_stream.is_open())
-    {
-        std::stringstream s_stream;
-        s_stream << ifs_stream.rdbuf();
-        ifs_stream.close();
-
-        source = s_stream.str();
-    }
-    else
-    {
-        std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ\n";
+    if(source.empty())
         return false;
-    }
 
-    GLuint shader = glCreateShader(type);
+    unsigned shader = compileShaderFromSource(source, type);
 
-    const GLchar* c_str = source.c_str();
+    if(!shader)
+        return false;
 
-    glShaderSource(shader, 1, &c_str, 0);
-    glCompileShader(shader);
-    checkCompileErrors(shader, "SHADER");
-
-    glAttachShader(m_handle, shader);
-    glLinkProgram(m_handle);
-    checkCompileErrors(m_handle, "PROGRAM");
-
-    glDeleteShader(shader);
+    linkShaderToProgram(shader);
 
     return true;
 }
 
-bool Shader::compile(const std::string &filename_vert, const std::string &filename_frag) noexcept
+bool Shader::compile(const std::string &vert, const std::string &frag) noexcept
 {
-    return compile(filename_vert, GL_VERTEX_SHADER) && compile(filename_frag, GL_FRAGMENT_SHADER);
+    return compile(vert, GL_VERTEX_SHADER) && compile(frag, GL_FRAGMENT_SHADER);
 }
 
-bool Shader::compile(const std::string &filename_vert, const std::string &filename_frag, const std::string &filename_geom) noexcept
+bool Shader::compile(const std::string &vert, const std::string &frag, const std::string &geom) noexcept
 {
-    return compile(filename_vert, GL_VERTEX_SHADER) && compile(filename_frag, GL_FRAGMENT_SHADER) && compile(filename_geom, GL_GEOMETRY_SHADER);
-}
-
-void Shader::bind() noexcept
-{
-    glUseProgram(m_handle);
-}
-
-void Shader::unbind() noexcept
-{
-    glUseProgram(0);
+    return compile(vert, GL_VERTEX_SHADER) && compile(frag, GL_FRAGMENT_SHADER) && compile(geom, GL_GEOMETRY_SHADER);
 }
 
 int Shader::getUniformLocation(const char *name) const noexcept
 {
-    return glGetUniformLocation(m_handle, name);
+    if(!m_program)
+        return -1;
+
+    return glGetUniformLocation(m_program, name);
 }
 
-GLuint Shader::getHandle() const noexcept
+void Shader::bind(const Shader* shader) noexcept
 {
-    return m_handle;
+    if(shader)
+        glUseProgram(shader->m_program);
 }
 
-void Shader::setUniform(int loc, const glm::vec2& value) noexcept
+std::string Shader::readShaderSourceFromFile(const std::string& filepath)
 {
-    if (loc != -1)
-        glUniform2fv(loc, 1, glm::value_ptr(value));
+    std::string source;
+
+    FILE* pFile = fopen(filepath.c_str(), "r");
+
+    if (!pFile)
+    {
+        std::cerr << "Error: shader file not succesfully read\n";
+
+        return source;
+    }
+
+    fseek(pFile, 0, SEEK_END);
+    size_t length = ftell(pFile);
+
+    source.resize(length + 1);
+
+    fseek(pFile, 0, SEEK_SET);
+    fread(&source[0], sizeof(char), length, pFile);
+    fclose(pFile);
+
+    return source;
 }
 
-void Shader::setUniform(int loc, const glm::vec3& value) noexcept
+unsigned Shader::compileShaderFromSource(const std::string& source, unsigned type)
 {
-    if (loc != -1)
-        glUniform3fv(loc, 1, glm::value_ptr(value));
+    unsigned shader = glCreateShader(type);
+    const char* c_str = source.c_str();
+
+    glShaderSource(shader, 1, &c_str, 0);
+    glCompileShader(shader);
+
+    int success = 0;
+    
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+
+    if (!success)
+    {
+        char infoLog[1024]{};
+
+        glGetShaderInfoLog(shader, 1024, NULL, infoLog);
+
+        std::cerr << "Error: shader compilation error\n"
+            << infoLog << "\n -- --------------------------------------------------- -- \n";
+
+        return 0;
+    }
+
+    return shader;
 }
 
-void Shader::setUniform(int loc, const glm::vec4& value) noexcept
+void Shader::linkShaderToProgram(unsigned shader)
 {
-    if (loc != -1)
-        glUniform4fv(loc, 1, glm::value_ptr(value));
-}
+    glAttachShader(m_program, shader);
+    glLinkProgram(m_program); 
 
-void Shader::setUniform(int loc, const glm::mat4& matrix) noexcept
-{
-    if (loc != -1)
-        glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
-}
-
-void Shader::setUniform(int loc, const float* matrix) noexcept
-{
-    if (loc != -1)
-        glUniformMatrix4fv(loc, 1, GL_FALSE, matrix);
-}
-
-void Shader::checkCompileErrors(GLuint shader, std::string type)
-{
-    int success;
+    int success = 0;
     char infoLog[1024]{};
+  
+    glGetProgramiv(m_program, GL_LINK_STATUS, &success);
 
-    if (type != "PROGRAM")
+    if (!success)
     {
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n"
-                      << infoLog << "\n -- --------------------------------------------------- -- \n";
-        }
+        glGetProgramInfoLog(shader, 1024, NULL, infoLog);
+
+        std::cerr << "Error: shader program link error\n"
+            << infoLog << "\n -- --------------------------------------------------- -- \n";
     }
-    else
-    {
-        glGetProgramiv(shader, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n"
-                      << infoLog << "\n -- --------------------------------------------------- -- \n";
-        }
-    }
+
+    glDeleteShader(shader);
 }

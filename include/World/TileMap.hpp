@@ -73,7 +73,7 @@ public:
 	Vector2u        getMapSizeInPixels() const noexcept;
 	const Vector2u& getTileSize()        const noexcept;
 
-	void draw(const std::uint32_t shader) noexcept;
+	void draw() noexcept;
 	
 private:
 	bool loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept;

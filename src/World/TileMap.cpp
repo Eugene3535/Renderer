@@ -102,10 +102,8 @@ const Vector2u& TileMap::getTileSize() const noexcept
 	return m_tileSize;
 }
 
-void TileMap::draw(const std::uint32_t shader) noexcept
+void TileMap::draw() noexcept
 {
-	glUseProgram(shader);
-
 	for (auto& plane : m_tilePlanes)
 		for (auto& layer : plane.m_tileLayers)
 		{
@@ -115,8 +113,6 @@ void TileMap::draw(const std::uint32_t shader) noexcept
 			glBindVertexArray(0);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
-
-	glUseProgram(0);
 }
 
 bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
