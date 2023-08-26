@@ -112,7 +112,7 @@ void TileMap::draw(const std::uint32_t shader) noexcept
 	for (auto& plane : m_tilePlanes)
 		for (auto& layer : plane.m_tileLayers)
 		{
-			layer.pTexture->bind(layer.pTexture);
+			glBindTexture(GL_TEXTURE_2D, layer.pTexture->texture);
 			glBindVertexArray(layer.vao);
 			glDrawElements(GL_TRIANGLES, static_cast<std::uint32_t>(layer.indices.size()), GL_UNSIGNED_INT, layer.indices.data());
 			glBindVertexArray(0);
@@ -211,14 +211,13 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 					std::uint32_t offsetX = X * tile_width;
 					std::uint32_t offsetY = Y * tile_height;
 
-					float ratioX = 1.0f / pLayer->pTexture->getSize().x;
-					float ratioY = 1.0f / pLayer->pTexture->getSize().y;
+					auto ratio = 1.0f / Vector2f(pLayer->pTexture->width, pLayer->pTexture->height);
 
 //                  Texture coords
-					float left = offsetX * ratioX;
-					float top = offsetY * ratioY;
-					float right = (offsetX + tile_width) * ratioX;
-					float bottom = (offsetY + tile_height) * ratioY;
+					float left = offsetX * ratio.x;
+					float top = offsetY * ratio.y;
+					float right = (offsetX + tile_width) * ratio.x;
+					float bottom = (offsetY + tile_height) * ratio.y;
 
 //                  Vertex coords
 					Vector2f leftBottom  = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height + tile_height) };

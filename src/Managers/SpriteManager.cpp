@@ -34,7 +34,7 @@ bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTextu
 	if( ! it.second )
 		return false;
 
-	auto ratio = 1.0f / Vector2f(pTexture->getSize());
+	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
 
 	auto& anim      = it.first->second;
 	anim.pTexture   = pTexture;
@@ -66,12 +66,11 @@ bool SpriteManager::createLinearAnimaton(const std::string &name, const Texture2
 	anim.fps        = fps;
 	anim.delay      = delay;
 
-	const auto& texSize = pTexture->getSize();
-	int frameWidth = texSize.x / duration;
-	auto ratio = 1.0f / Vector2f(texSize);
+	int frameWidth = pTexture->width / duration;
+	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
 
 	for (int i = 0; i < duration; ++i)
-		createVerticesFromFrame(IntRect(i * frameWidth, 0, frameWidth, texSize.y), ratio);
+		createVerticesFromFrame(IntRect(i * frameWidth, 0, frameWidth, pTexture->height), ratio);
 	
     return true;
 }
@@ -98,10 +97,9 @@ bool SpriteManager::createGridAnimaton(const std::string &name, const Texture2D 
 	anim.fps        = fps;
 	anim.delay      = delay;
 
-	const auto& texSize     = pTexture->getSize();
-	int         frameWidth  = texSize.x / columns;
-	int         frameHeight = texSize.y / rows;
-	auto        ratio       = 1.0f / Vector2f(texSize);
+	int  frameWidth  = pTexture->width / columns;
+	int  frameHeight = pTexture->height / rows;
+	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
 
 	for (int y = 0; y < rows; ++y)
 		for (int x = 0; x < columns; ++x)	
@@ -137,7 +135,7 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
 
 	auto pSpriteSheet = &ssIt.first->second;
 
-	auto ratio = 1.0f / Vector2f(pTexture->getSize());
+	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
 
 	for(auto pAnimNode = pSpritesNode->first_node("animation");
 		     pAnimNode != nullptr;

@@ -1,71 +1,48 @@
-#include <glad/glad.h>
-
-#include "Graphics/Image.hpp"
 #include "Graphics/Texture2D.hpp"
 
-Texture2D::Texture2D()  noexcept: 
-    m_size(),
-    m_handle(0),
-    m_isRepeated(false),
-    m_isSmooth(false)
-{
-}
+#include <cstring>
 
-Texture2D::~Texture2D()
-{
-    if(m_handle) 
-        glDeleteTextures(1, &m_handle);
-}
+#include "stb_image.h"
 
-bool Texture2D::loadFromFile(const std::string& filepath) noexcept
-{
-    Image image;
+#include <glad/glad.h>
 
-    if( ! image.loadFromFile(filepath) )
+bool LoadImageFromFile(const std::string& filepath, std::vector<unsigned char>& pixels, int& width, int& height)
+{
+    pixels.clear();
+
+    int bytePerPixel = 0;
+    unsigned char* pData = stbi_load(filepath.c_str(), &width, &height, &bytePerPixel, STBI_rgb_alpha);
+
+    if (!pData)
         return false;
 
-    if (m_handle) 
-        glDeleteTextures(1, &m_handle);
-
-    glGenTextures(1, &m_handle);
-
-    setRepeated(false);
-    setSmooth(false);
-
-    m_size = image.getSize();
-    
-    glBindTexture(GL_TEXTURE_2D, m_handle);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_size.x, m_size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getData());
-    glGenerateMipmap(GL_TEXTURE_2D);
-    unbind();   
+    pixels.resize(static_cast<size_t>(width * height * 4));
+    std::memcpy(&pixels[0], pData, pixels.size());
+    stbi_image_free(pData);
 
     return true;
 }
 
-void Texture2D::bind(const Texture2D* pTexture, unsigned slot) noexcept
+void CreateTextureFromImage(const std::vector<unsigned char>& pixels, Texture2D& texture)
 {
-    if (pTexture)
-    {
-        glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, pTexture->getHandle());
-    }
+	unsigned* pTexture = &texture.texture;
+
+	glGenTextures(1, pTexture);
+
+	glBindTexture(GL_TEXTURE_2D, *pTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture2D::unbind() noexcept
+void SetTexture2DRepeated(unsigned texture, bool repeat)
 {
-    glBindTexture(GL_TEXTURE_2D, 0);        
-}
-
-void Texture2D::setRepeated(bool repeat) noexcept
-{
-    glBindTexture(GL_TEXTURE_2D, m_handle);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     if (repeat)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-        m_isRepeated = true;
     }
     else
     {
@@ -75,48 +52,25 @@ void Texture2D::setRepeated(bool repeat) noexcept
         const static float border_color[] { 0.0f, 0.0f, 0.0f, 1.0f };
         glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border_color);
 
-        m_isRepeated = false;
     }
-    unbind();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Texture2D::setSmooth(bool smooth) noexcept
+void SetTexture2DSmooth(unsigned texture, bool smooth)
 {
-    glBindTexture(GL_TEXTURE_2D, m_handle);
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     if (smooth)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        m_isSmooth = true;
     }
     else
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        m_isSmooth = false;
     }
-    unbind();
-}
 
-bool Texture2D::isRepeated() const noexcept
-{
-    return m_isRepeated;
-}
-
-bool Texture2D::isSmooth() const noexcept
-{
-    return m_isSmooth;
-}
-
-const Vector2i& Texture2D::getSize() const noexcept
-{
-    return m_size;
-}
-
-GLuint Texture2D::getHandle() const noexcept
-{
-    return m_handle;
+    glBindTexture(GL_TEXTURE_2D, 0);
 }

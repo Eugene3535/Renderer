@@ -83,15 +83,20 @@ private:
 
                 if (result)
                 {
-                    if (!iterator->second.loadFromFile(filepath))
+                    std::vector<unsigned char> pixels;
+                    auto& texture = iterator->second;
+
+                    if(!LoadImageFromFile(filepath, pixels, texture.width, texture.height))
                     {
                         container.erase(filename);
 
                         return nullptr;
                     }
-                }
 
-                return &iterator->second;
+                    CreateTextureFromImage(pixels, texture);
+
+                    return &texture;
+                }
             }
         }
         else if constexpr (std::is_same<T, Shader>::value)

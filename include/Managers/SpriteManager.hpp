@@ -13,7 +13,7 @@ class SpriteManager
 public:
 	struct Animation2D
 	{
-		const class Texture2D* pTexture = nullptr;
+		const struct Texture2D* pTexture = nullptr;
 
 		unsigned startFrame = 0u;   // Start frame number
 		unsigned duration   = 0u;   // Number of frames
@@ -28,10 +28,10 @@ public:
 	SpriteManager() noexcept;
 	~SpriteManager();
 
-	bool createFrame(const std::string& name, const class Texture2D* pTexture, const IntRect& frame) noexcept;
-	bool createLinearAnimaton(const std::string& name, const class Texture2D* pTexture, int duration, int fps, float delay = 1.0f) noexcept;
-	bool createGridAnimaton(const std::string& name, const class Texture2D* pTexture, int columns, int rows, int fps, float delay = 1.0f) noexcept;
-	bool loadSpriteSheet(const std::string& filename, const class Texture2D* pTexture) noexcept;
+	bool createFrame(const std::string& name, const struct Texture2D* pTexture, const IntRect& frame) noexcept;
+	bool createLinearAnimaton(const std::string& name, const struct Texture2D* pTexture, int duration, int fps, float delay = 1.0f) noexcept;
+	bool createGridAnimaton(const std::string& name, const struct Texture2D* pTexture, int columns, int rows, int fps, float delay = 1.0f) noexcept;
+	bool loadSpriteSheet(const std::string& filename, const struct Texture2D* pTexture) noexcept;
 
 	const Animation2D* getAnimation(const std::string& name)   const noexcept;
 	const SpriteSheet* getSpriteSheet(const std::string& name) const noexcept;
