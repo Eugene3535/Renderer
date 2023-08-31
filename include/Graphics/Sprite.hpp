@@ -10,7 +10,7 @@ public:
 	void setTexture(unsigned texture) noexcept;
 	void setFrame(unsigned frameNum) noexcept;
 
-	void draw() noexcept;
+	void draw(class Renderer* renderer) noexcept;
 
 private:
 	unsigned m_texture;

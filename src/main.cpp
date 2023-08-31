@@ -10,6 +10,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Graphics/Shader.hpp"
+#include "Graphics/Renderer.hpp"
 #include "Graphics/Sprite.hpp"
 
 #include "Managers/AssetManager.hpp"
@@ -71,6 +72,8 @@ int main()
         }, 0 );
 #endif
 
+    Renderer renderer;
+
     AssetManager al;
     SpriteManager sm;
 
@@ -105,7 +108,7 @@ int main()
     TimeStamp timestamp = Clock::now();
 
     Transform2D model;
-    model.setOrigin(128, 128)->setPosition(400, 300)->setScale(3, 3);
+    model.setOrigin(128, 128)->setPosition(400, 300);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -133,8 +136,10 @@ int main()
         if(IsKeyPressed(window, GLFW_KEY_S))
             view = glm::translate(view,glm::vec3(0, -3, 0) );
 
+        const glm::mat4 viewProjMat { projection * view }; 
+
         Shader::bind(tilemapShader);
-        glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view));
+        glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(viewProjMat));
         tm.draw();
 
         if(++counter > 2)
@@ -148,10 +153,12 @@ int main()
             sprite.setFrame(frameNum);
         }
 
+        model.move(1, 0);
+
         sm.bind();
         Shader::bind(spriteShader);
-        glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(projection * view * model.getMatrix()));
-        sprite.draw();
+        glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(viewProjMat * model.getMatrix()));
+        renderer.draw(sprite);
         sm.unbind();
 
         glfwSwapBuffers(window);

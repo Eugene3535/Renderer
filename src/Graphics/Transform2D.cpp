@@ -4,8 +4,6 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-static constexpr float factor = 3.141592654f / 180.f;
-
 Transform2D::Transform2D() noexcept :
     m_matrix(glm::identity<glm::mat4>()),
     m_origin(0.0f, 0.0f),
@@ -126,6 +124,8 @@ Transform2D* Transform2D::scale(const glm::vec2& factor) noexcept
 
 const glm::mat4& Transform2D::getMatrix() const noexcept
 {
+    static constexpr float factor = 3.141592654f / 180.f;
+    
     // Recompute the matrix if needed
     if (m_transformNeedUpdate)
     {
