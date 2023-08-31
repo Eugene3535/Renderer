@@ -5,7 +5,7 @@
 
 #define DEGTORAD 0.017453f
 #define RADTODEG 57.29577f
+#define EPSILON 0.000001f
 
-#define MAX_CHILDS 8
 
 #endif

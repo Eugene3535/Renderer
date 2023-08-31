@@ -13,7 +13,6 @@
 
 #include "Utils/Files.hpp"
 #include "Utils/Defines.hpp"
-#include "Geometry/Vector2.hpp"
 #include "Managers/AssetManager.hpp"
 
 TileMap::TileMap() noexcept:
@@ -87,17 +86,17 @@ std::vector<const TileMap::Object*> TileMap::getObjectsByType(const std::string&
 	return objects;
 }
 
-const Vector2u& TileMap::getMapSizeInTiles()  const noexcept
+const glm::uvec2& TileMap::getMapSizeInTiles()  const noexcept
 {
 	return m_mapSize;
 }
 
-Vector2u TileMap::getMapSizeInPixels() const noexcept
+glm::uvec2 TileMap::getMapSizeInPixels() const noexcept
 {
 	return { m_mapSize.x * m_tileSize.x, m_mapSize.y * m_tileSize.y };
 }
 
-const Vector2u& TileMap::getTileSize() const noexcept
+const glm::uvec2& TileMap::getTileSize() const noexcept
 {
 	return m_tileSize;
 }
@@ -137,8 +136,8 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 		return false;
 #endif
 
-	m_mapSize  = Vector2u(map_width, map_height);
-	m_tileSize = Vector2u(tile_width, tile_height);
+	m_mapSize  = glm::uvec2(map_width, map_height);
+	m_tileSize = glm::uvec2(tile_width, tile_height);
 
 	for (auto pLayerNode = pMapNode->first_node("layer");
 		pLayerNode != nullptr;
@@ -204,7 +203,7 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 					std::uint32_t offsetX = X * tile_width;
 					std::uint32_t offsetY = Y * tile_height;
 
-					auto ratio = 1.0f / Vector2f(pLayer->pTexture->width, pLayer->pTexture->height);
+					auto ratio = 1.0f / glm::vec2(pLayer->pTexture->width, pLayer->pTexture->height);
 
 //                  Texture coords
 					float left = offsetX * ratio.x;
@@ -213,10 +212,10 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 					float bottom = (offsetY + tile_height) * ratio.y;
 
 //                  Vertex coords
-					Vector2f leftBottom  = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height + tile_height) };
-					Vector2f rightBootom = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height + tile_height) };
-					Vector2f rightTop    = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height) };
-					Vector2f leftTop     = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height) };
+					glm::vec2 leftBottom  = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height + tile_height) };
+					glm::vec2 rightBootom = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height + tile_height) };
+					glm::vec2 rightTop    = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height) };
+					glm::vec2 leftTop     = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height) };
 
 //                  Index stride
 					std::uint32_t index = static_cast<std::uint32_t>(pLayer->vertices.size());

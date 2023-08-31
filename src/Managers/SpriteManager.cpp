@@ -1,3 +1,5 @@
+#include <memory>
+
 #include <glad/glad.h>
 
 #include "rapidxml_ext.h"
@@ -18,7 +20,7 @@ SpriteManager::~SpriteManager()
 	release();
 }
 
-bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTexture, const IntRect &frame) noexcept
+bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTexture, const glm::ivec4 &frame) noexcept
 {
 	if (!pTexture)
 		return false;
@@ -33,7 +35,7 @@ bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTextu
 	if( ! it.second )
 		return false;
 
-	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
+	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
 
 	auto& anim      = it.first->second;
 	anim.pTexture   = pTexture;
@@ -68,10 +70,10 @@ bool SpriteManager::createLinearAnimaton(const std::string &name, const Texture2
 	anim.delay      = delay;
 
 	int frameWidth = pTexture->width / duration;
-	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
+	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
 
 	for (int i = 0; i < duration; ++i)
-		createVerticesFromFrame(IntRect(i * frameWidth, 0, frameWidth, pTexture->height), ratio);
+		createVerticesFromFrame(glm::ivec4(i * frameWidth, 0, frameWidth, pTexture->height), ratio);
 	
     return true;
 }
@@ -100,11 +102,11 @@ bool SpriteManager::createGridAnimaton(const std::string &name, const Texture2D 
 
 	int  frameWidth  = pTexture->width / columns;
 	int  frameHeight = pTexture->height / rows;
-	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
+	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
 
 	for (int y = 0; y < rows; ++y)
 		for (int x = 0; x < columns; ++x)	
-			createVerticesFromFrame(IntRect(x * frameWidth, y * frameHeight, frameWidth, frameHeight), ratio);
+			createVerticesFromFrame(glm::ivec4(x * frameWidth, y * frameHeight, frameWidth, frameHeight), ratio);
 
     return true;
 }
@@ -136,7 +138,7 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
 
 	auto pSpriteSheet = &ssIt.first->second;
 
-	auto ratio = 1.0f / Vector2f(pTexture->width, pTexture->height);
+	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
 
 	for(auto pAnimNode = pSpritesNode->first_node("animation");
 		     pAnimNode != nullptr;
@@ -176,7 +178,7 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
 			int w = pW ? atoi(pW->value()) : 0;
 			int h = pH ? atoi(pH->value()) : 0;
 
-			createVerticesFromFrame(IntRect(x, y, w, h), ratio);
+			createVerticesFromFrame(glm::ivec4(x, y, w, h), ratio);
 			pAnim->duration++;
 
 			pCutNode = pCutNode->next_sibling();
@@ -255,7 +257,7 @@ void SpriteManager::release() noexcept
 	}
 }
 
-void SpriteManager::createVerticesFromFrame(const IntRect &frame, const Vector2f &ratio) noexcept
+void SpriteManager::createVerticesFromFrame(const glm::ivec4 &frame, const glm::vec2 &ratio) noexcept
 {
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
@@ -264,15 +266,15 @@ void SpriteManager::createVerticesFromFrame(const IntRect &frame, const Vector2f
 
 	Vertex2D* quad = &m_vertexBuffer[m_vertexBuffer.size() - 4];
 
-	quad[1].position.x = static_cast<float>(frame.width);
-	quad[2].position.x = static_cast<float>(frame.width);
-	quad[2].position.y = static_cast<float>(frame.height);
-	quad[3].position.y = static_cast<float>(frame.height);
+	quad[1].position.x = static_cast<float>(frame.z);
+	quad[2].position.x = static_cast<float>(frame.z);
+	quad[2].position.y = static_cast<float>(frame.w);
+	quad[3].position.y = static_cast<float>(frame.w);
 
-	float left   = frame.left * ratio.x;
-	float top    = frame.top * ratio.y;
-	float right  = (frame.left + frame.width) * ratio.x;
-	float bottom = (frame.top + frame.height) * ratio.y;
+	float left   = frame.x * ratio.x;
+	float top    = frame.y * ratio.y;
+	float right  = (frame.x + frame.z) * ratio.x;
+	float bottom = (frame.y + frame.w) * ratio.y;
 
 	quad[0].texCoords.x = left;
 	quad[0].texCoords.y = top;

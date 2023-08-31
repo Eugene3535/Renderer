@@ -17,6 +17,8 @@
 
 #include "World/TileMap.hpp"
 
+#include "Graphics/Transform2D.hpp"
+
 using Clock = std::chrono::high_resolution_clock;
 using TimeStamp = std::chrono::time_point<Clock>;
 
@@ -75,32 +77,35 @@ int main()
     sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 30);
     sm.unloadOnGPU();
 
+    TileMap tm;
+    tm.loadFromFile("TestMap.tmx");
+
     Sprite sprite;
     sprite.setTexture(AssetManager::get<Texture2D>("Explosion.png")->texture);
     sprite.setFrame(0);
 
-    Shader* shader = AssetManager::get<Shader>("TileMapShader", "tilemap.vert", "tilemap.frag");
-    Shader::bind(shader);
+    Shader* tilemapShader = AssetManager::get<Shader>("TileMapShader", "TileMap.vert", "TileMap.frag");
+    Shader::bind(tilemapShader);
+    
+    int ViewProjection = tilemapShader->getUniformLocation("ViewProjection");
 
-    TileMap tm;
-    tm.loadFromFile("TestMap.tmx");
+    glm::mat4 projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, -1.0f, 1.0f);
+    glm::mat4 view(glm::identity<glm::mat4>());
 
-    glm::mat4 projection(1.0f);
-    projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, -1.0f, 1.0f);
+    glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view));
 
-    glm::mat4 view(1.0f);
-    view = glm::translate(view,glm::vec3(0, 0, 0) );
+    Shader* spriteShader = AssetManager::get<Shader>("SpriteShader", "Sprite.vert", "Sprite.frag");
+    Shader::bind(spriteShader);
 
-    GLint projLoc = shader->getUniformLocation("projection");
-    GLint viewLoc = shader->getUniformLocation("view");
-
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    int ModelViewProjectionLoc = spriteShader->getUniformLocation("ModelViewProjection");
 
     int counter = 0;
     int frameNum = 0;
 
     TimeStamp timestamp = Clock::now();
+
+    Transform2D model;
+    model.setOrigin(128, 128)->setPosition(400, 300)->setScale(3, 3);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -128,10 +133,8 @@ int main()
         if(IsKeyPressed(window, GLFW_KEY_S))
             view = glm::translate(view,glm::vec3(0, -3, 0) );
 
-        Shader::bind(shader);
-
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
+        Shader::bind(tilemapShader);
+        glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view));
         tm.draw();
 
         if(++counter > 2)
@@ -146,6 +149,8 @@ int main()
         }
 
         sm.bind();
+        Shader::bind(spriteShader);
+        glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(projection * view * model.getMatrix()));
         sprite.draw();
         sm.unbind();
 

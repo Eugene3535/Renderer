@@ -5,8 +5,9 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Geometry/Vertex2D.hpp"
-#include "Geometry/Rect.hpp"
+#include <glm/glm.hpp>
+
+#include "Graphics/Vertex2D.hpp"
 #include "Managers/Base/Manager.hpp"
 
 class SpriteManager:
@@ -30,7 +31,7 @@ public:
 	SpriteManager() noexcept;
 	~SpriteManager();
 
-	bool createFrame(const std::string& name, const struct Texture2D* pTexture, const IntRect& frame) noexcept;
+	bool createFrame(const std::string& name, const struct Texture2D* pTexture, const glm::ivec4& frame) noexcept;
 	bool createLinearAnimaton(const std::string& name, const struct Texture2D* pTexture, int duration, int fps, float delay = 1.0f) noexcept;
 	bool createGridAnimaton(const std::string& name, const struct Texture2D* pTexture, int columns, int rows, int fps, float delay = 1.0f) noexcept;
 	bool loadSpriteSheet(const std::string& filename, const struct Texture2D* pTexture) noexcept;
@@ -44,14 +45,14 @@ public:
 	void release()     noexcept;
 
 private:
-	void createVerticesFromFrame(const IntRect& frame, const Vector2f& ratio) noexcept;
+	void createVerticesFromFrame(const glm::ivec4& frame, const glm::vec2& ratio) noexcept;
 
 private:
 	std::unordered_map<std::string, Animation2D> m_animations;
 	std::unordered_map<std::string, SpriteSheet> m_spriteSheets;
 
-	std::vector<Vertex2D> m_vertexBuffer;
-	std::vector<Vector2i> m_spriteSizes;
+	std::vector<Vertex2D>   m_vertexBuffer;
+	std::vector<glm::ivec2> m_spriteSizes;
 
 	unsigned m_vao;
 	unsigned m_vbo;

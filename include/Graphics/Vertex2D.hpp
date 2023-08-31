@@ -1,16 +1,16 @@
 #ifndef VERTEX2D_HPP
 #define VERTEX2D_HPP
 
-#include "Vector2.hpp"
+#include <glm/glm.hpp>
 
 struct Vertex2D
 {
 	Vertex2D() noexcept;
 	Vertex2D(float x, float y, float u, float v) noexcept;
-	Vertex2D(const Vector2f& thePosition, const Vector2f& theTexCoords) noexcept;
+	Vertex2D(const glm::vec2& thePosition, const glm::vec2& theTexCoords) noexcept;
 
-    Vector2f position;
-	Vector2f texCoords;
+    glm::vec2 position;
+	glm::vec2 texCoords;
 };
 
 inline Vertex2D::Vertex2D() noexcept: 
@@ -25,7 +25,7 @@ inline Vertex2D::Vertex2D(float x, float y, float u, float v) noexcept:
 {
 }
 
-inline Vertex2D::Vertex2D(const Vector2f& thePosition, const Vector2f& theTexCoords) noexcept:
+inline Vertex2D::Vertex2D(const glm::vec2& thePosition, const glm::vec2& theTexCoords) noexcept:
 	position(thePosition),
 	texCoords(theTexCoords)
 {

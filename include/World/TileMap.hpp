@@ -7,8 +7,7 @@
 
 #include "rapidxml.hpp"
 
-#include "Geometry/Vector2.hpp"
-#include "Geometry/Vertex2D.hpp"
+#include "Graphics/Vertex2D.hpp"
 
 class TileMap
 {
@@ -54,8 +53,8 @@ public:
 
 		std::vector<Property> properties;
 
-		Vector2u position;
-		Vector2u size;
+		glm::uvec2 position;
+		glm::uvec2 size;
 	};
 
 public:
@@ -69,9 +68,9 @@ public:
 	std::vector<const Object*>    getObjectsByName(const std::string&) const noexcept;
 	std::vector<const Object*>    getObjectsByType(const std::string&) const noexcept;
 
-	const Vector2u& getMapSizeInTiles()  const noexcept;
-	Vector2u        getMapSizeInPixels() const noexcept;
-	const Vector2u& getTileSize()        const noexcept;
+	const glm::uvec2& getMapSizeInTiles()  const noexcept;
+	glm::uvec2        getMapSizeInPixels() const noexcept;
+	const glm::uvec2& getTileSize()        const noexcept;
 
 	void draw() noexcept;
 	
@@ -90,8 +89,8 @@ private:
 	std::vector<Object>    m_objects;
 	std::string            m_name;
 	std::string            m_collisionMask;	
-	Vector2u               m_mapSize;
-	Vector2u               m_tileSize;
+	glm::uvec2             m_mapSize;
+	glm::uvec2             m_tileSize;
 };
 
 #endif
