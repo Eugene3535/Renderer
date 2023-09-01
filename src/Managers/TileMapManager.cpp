@@ -1,4 +1,4 @@
-#include "World/TileMap.hpp"
+#include "Managers/TileMapManager.hpp"
 
 #include <glad/glad.h>
 
@@ -15,31 +15,29 @@
 #include "Utils/Defines.hpp"
 #include "Managers/AssetManager.hpp"
 
-TileMap::TileMap() noexcept:
-	m_mapSize(),
-	m_tileSize()
+TileMapManager::TileMapManager() noexcept
 {
 }
 
-TileMap::~TileMap()
+TileMapManager::~TileMapManager()
 {
-	for (auto& plane : m_tilePlanes)
-		for (auto& layer : plane.m_tileLayers)
-		{
-			if(layer.vao)
-				glDeleteVertexArrays(1, &layer.vao);
+	// for (auto& plane : m_tilePlanes)
+	// 	for (auto& layer : plane.m_tileLayers)
+	// 	{
+	// 		if(layer.vao)
+	// 			glDeleteVertexArrays(1, &layer.vao);
 
-			if(layer.vbo)
-				glDeleteBuffers(1, &layer.vbo);
-		}		
+	// 		if(layer.vbo)
+	// 			glDeleteBuffers(1, &layer.vbo);
+	// 	}		
 }
 
-bool TileMap::loadFromFile(const std::string& filename) noexcept
+const TileMapManager::TileMap* TileMapManager::loadFromFile(const std::string& filename) noexcept
 {
-	std::string filepath = FileUtils::getPathToFile(filename);
+	const std::string filepath = FileUtils::getPathToFile(filename);
 
 	if(filepath.empty())
-		return false;
+		return nullptr;
 
 	auto pDocument = std::make_unique<rapidxml::xml_document<char>>();
 	rapidxml::file<char> xmlFile(filepath.c_str());
@@ -47,64 +45,27 @@ bool TileMap::loadFromFile(const std::string& filename) noexcept
 	const rapidxml::xml_node<char>* pMapNode = pDocument->first_node("map");
 
 	if( ! pMapNode )
-		return false;
+		return nullptr;
 
-	m_name = filename;
+	auto& pTileMap = m_tileMaps.emplace_back(std::make_unique<TileMapManager::TileMap>());
+	pTileMap->name = filename;
 
-	return (loadTilePlanes(pMapNode) && loadObjects(pMapNode));
+	if ( ! (loadTilePlanes(pMapNode) && loadObjects(pMapNode)) )
+	{
+		m_tileMaps.pop_back();
+
+		return nullptr;
+	}
+
+	return pTileMap.get();
 }
 
-const std::vector<TileMap::TilePlane>& TileMap::getTilePlanes() const noexcept
+void TileMapManager::draw() noexcept
 {
-	return m_tilePlanes;
-}
+	const auto pTileMap = m_tileMaps.back().get();
 
-const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
-{
-	return m_objects;
-}
-
-std::vector<const TileMap::Object*> TileMap::getObjectsByName(const std::string& name) const noexcept
-{
-	std::vector<const TileMap::Object*> objects;
-
-	for (auto& obj : m_objects)
-		if (obj.name == name)
-			objects.push_back(std::addressof(obj));
-
-	return objects;
-}
-
-std::vector<const TileMap::Object*> TileMap::getObjectsByType(const std::string& type) const noexcept
-{
-	std::vector<const TileMap::Object*> objects;
-
-	for (auto& obj : m_objects)
-		if (obj.type == type)
-			objects.push_back(std::addressof(obj));
-
-	return objects;
-}
-
-const glm::uvec2& TileMap::getMapSizeInTiles()  const noexcept
-{
-	return m_mapSize;
-}
-
-glm::uvec2 TileMap::getMapSizeInPixels() const noexcept
-{
-	return { m_mapSize.x * m_tileSize.x, m_mapSize.y * m_tileSize.y };
-}
-
-const glm::uvec2& TileMap::getTileSize() const noexcept
-{
-	return m_tileSize;
-}
-
-void TileMap::draw() noexcept
-{
-	for (auto& plane : m_tilePlanes)
-		for (auto& layer : plane.m_tileLayers)
+	for (auto& plane : pTileMap->tilePlanes)
+		for (auto& layer : plane.tileLayers)
 		{
 			glBindTexture(GL_TEXTURE_2D, layer.pTexture->texture);
 			glBindVertexArray(layer.vao);
@@ -114,7 +75,7 @@ void TileMap::draw() noexcept
 		}
 }
 
-bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
+bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 {
 	std::vector<TilesetData> tilesets = parseTilesets(pMapNode);
 
@@ -126,22 +87,24 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 	auto pTileW = pMapNode->first_attribute("tilewidth");
 	auto pTileH = pMapNode->first_attribute("tileheight");
 
-	const std::uint32_t map_width   = pMapW  ? std::strtol(pMapW->value(),  NULL, 10) : 0;
-	const std::uint32_t map_height  = pMapH  ? std::strtol(pMapH->value(),  NULL, 10) : 0;
-	const std::uint32_t tile_width  = pTileW ? std::strtol(pTileW->value(), NULL, 10) : 0;
-	const std::uint32_t tile_height = pTileH ? std::strtol(pTileH->value(), NULL, 10) : 0;
+	const glm::uint32_t map_width   = pMapW  ? std::strtol(pMapW->value(),  nullptr, 10) : 0;
+	const glm::uint32_t map_height  = pMapH  ? std::strtol(pMapH->value(),  nullptr, 10) : 0;
+	const glm::uint32_t tile_width  = pTileW ? std::strtol(pTileW->value(), nullptr, 10) : 0;
+	const glm::uint32_t tile_height = pTileH ? std::strtol(pTileH->value(), nullptr, 10) : 0;
 
 #ifdef DEBUG
 	if (!map_width || !map_height || !tile_width || !tile_height)
 		return false;
 #endif
 
-	m_mapSize  = glm::uvec2(map_width, map_height);
-	m_tileSize = glm::uvec2(tile_width, tile_height);
+	auto pTileMap = m_tileMaps.back().get();
+
+	pTileMap->mapSize  = glm::uvec2(map_width, map_height);
+	pTileMap->tileSize = glm::uvec2(tile_width, tile_height);
 
 	for (auto pLayerNode = pMapNode->first_node("layer");
-		pLayerNode != nullptr;
-		pLayerNode = pLayerNode->next_sibling("layer"))
+			  pLayerNode != nullptr;
+			  pLayerNode = pLayerNode->next_sibling("layer"))
 	{
 		auto pName = pLayerNode->first_attribute("name");
 		std::string name = pName ? pName->value() : std::string();
@@ -157,10 +120,10 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 		std::vector<std::uint32_t> parsed_layer = parseCSVstring(pDataNode);
 
 		std::size_t non_zero_tile_count = std::count_if(parsed_layer.begin(), parsed_layer.end(),
-			[](std::uint32_t n) { return n > 0; });
+			[](glm::uint32_t n) { return n > 0; });
 
-		auto& plane = m_tilePlanes.emplace_back();
-		plane.m_name = name;
+		auto& plane = pTileMap->tilePlanes.emplace_back();
+		plane.name = name;
 
 		for (std::uint32_t y = 0; y < map_height; ++y)
 			for (std::uint32_t x = 0; x < map_width; ++x)
@@ -177,19 +140,19 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 						});
 
 					// Is there associated tile layer for this tileset?
-					auto current_layer = std::find_if(plane.m_tileLayers.begin(), plane.m_tileLayers.end(),
-						[&current_tileset](const TileMap::TilePlane::TileLayer& layer)
+					auto current_layer = std::find_if(plane.tileLayers.begin(), plane.tileLayers.end(),
+						[&current_tileset](const TileMapManager::TilePlane::TileLayer& layer)
 						{
 							return current_tileset->pTexture == layer.pTexture;
 						});
 
-					TileMap::TilePlane::TileLayer* pLayer = nullptr;
+					TileMapManager::TilePlane::TileLayer* pLayer = nullptr;
 					// If not - we will create it
-					if (current_layer != plane.m_tileLayers.end())
+					if (current_layer != plane.tileLayers.end())
 						pLayer = std::addressof(*current_layer);
 					else
 					{
-						pLayer = std::addressof(plane.m_tileLayers.emplace_back());
+						pLayer = std::addressof(plane.tileLayers.emplace_back());
 						pLayer->pTexture = current_tileset->pTexture;
 					}
 
@@ -239,16 +202,17 @@ bool TileMap::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
 			}
 	}
 
-	for (auto& plane : m_tilePlanes)
-		for (auto& layer : plane.m_tileLayers)
+	for (auto& plane : pTileMap->tilePlanes)
+		for (auto& layer : plane.tileLayers)
 			unloadOnGPU(layer);
 
-	return !m_tilePlanes.empty();
+	return !pTileMap->tilePlanes.empty();
 }
 
-bool TileMap::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
+bool TileMapManager::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
 {
-	std::size_t objectAmount = 0;
+	auto pTileMap = m_tileMaps.back().get();
+	std::size_t objectAmount = 0u;
 
 	for (auto pObjectGroupNode = pMapNode->first_node("objectgroup");
 			  pObjectGroupNode != nullptr;
@@ -261,7 +225,7 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
 			objectAmount++;
 	}
 
-	m_objects.reserve(objectAmount);
+	pTileMap->objects.reserve(objectAmount);
 
 	for (auto pObjectGroupNode = pMapNode->first_node("objectgroup");
 			  pObjectGroupNode != nullptr;
@@ -271,7 +235,7 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
 				  pObjectNode != nullptr;
 				  pObjectNode = pObjectNode->next_sibling("object"))
 		{
-			auto& tme_object = m_objects.emplace_back();
+			auto& tme_object = pTileMap->objects.emplace_back();
 
 			for (auto pAttr = pObjectNode->first_attribute(); pAttr != nullptr; pAttr = pAttr->next_attribute())
 			{
@@ -303,10 +267,10 @@ bool TileMap::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
 		}
 	}
 
-	return !m_objects.empty();
+	return !pTileMap->objects.empty();
 }
 
-std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_node<char>* pMapNode) noexcept
+std::vector<TileMapManager::TilesetData> TileMapManager::parseTilesets(const rapidxml::xml_node<char>* pMapNode) noexcept
 {
 	std::vector<TilesetData> tilesets;
 
@@ -348,7 +312,7 @@ std::vector<TileMap::TilesetData> TileMap::parseTilesets(const rapidxml::xml_nod
 	return tilesets;
 }
 
-std::vector<std::uint32_t> TileMap::parseCSVstring(const rapidxml::xml_node<char>* pDataNode) noexcept
+std::vector<std::uint32_t> TileMapManager::parseCSVstring(const rapidxml::xml_node<char>* pDataNode) noexcept
 {
 	std::string data(pDataNode->value());
 
@@ -369,7 +333,7 @@ std::vector<std::uint32_t> TileMap::parseCSVstring(const rapidxml::xml_node<char
 	return parsed_layer;
 }
 
-void TileMap::unloadOnGPU(TileMap::TilePlane::TileLayer& layer) noexcept
+void TileMapManager::unloadOnGPU(TileMapManager::TilePlane::TileLayer& layer) noexcept
 {
 	glGenVertexArrays(1, &layer.vao);
 	glGenBuffers(1, &layer.vbo);

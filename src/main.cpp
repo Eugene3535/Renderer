@@ -15,8 +15,7 @@
 
 #include "Managers/AssetManager.hpp"
 #include "Managers/SpriteManager.hpp"
-
-#include "World/TileMap.hpp"
+#include "Managers/TileMapManager.hpp"
 
 #include "Graphics/Transform2D.hpp"
 
@@ -76,12 +75,12 @@ int main()
 
     AssetManager al;
     SpriteManager sm;
+    TileMapManager tm;
 
     sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 30);
     sm.unloadOnGPU();
 
-    TileMap tm;
-    tm.loadFromFile("TestMap.tmx");
+    auto tmp = tm.loadFromFile("TestMap.tmx");
 
     Sprite sprite;
     sprite.setTexture(AssetManager::get<Texture2D>("Explosion.png")->texture);
