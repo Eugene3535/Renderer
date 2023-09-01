@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 
 #include "Graphics/Renderer.hpp"
-#include "Graphics/Sprite.hpp"
+#include "Graphics/Primitives/Sprite.hpp"
 
 Sprite::Sprite() noexcept:
 	m_texture(0u),
@@ -21,11 +21,6 @@ void Sprite::setFrame(unsigned frameNum) noexcept
 
 void Sprite::draw(Renderer* renderer) noexcept
 {
-	Renderer::States states{0};
-	states.texture = m_texture;
-	states.mode = GL_TRIANGLE_FAN;
-	states.firstVertex = (m_frame << 2);
-	states.count = 4;
-
-	renderer->drawStates(states);
+	if(m_texture)
+		renderer->drawPrimitives(m_texture, GL_TRIANGLE_FAN, (m_frame << 2), 4);
 }

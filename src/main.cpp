@@ -11,7 +11,7 @@
 
 #include "Graphics/Shader.hpp"
 #include "Graphics/Renderer.hpp"
-#include "Graphics/Sprite.hpp"
+#include "Graphics/Primitives/Sprite.hpp"
 
 #include "Managers/AssetManager.hpp"
 #include "Managers/SpriteManager.hpp"
@@ -104,6 +104,7 @@ int main()
 
     int counter = 0;
     int frameNum = 0;
+    int angle = 0;
 
     TimeStamp timestamp = Clock::now();
 
@@ -153,6 +154,7 @@ int main()
             sprite.setFrame(frameNum);
         }
 
+        model.setRotation(angle++);
         model.move(1, 0);
 
         sm.bind();

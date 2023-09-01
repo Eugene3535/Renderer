@@ -7,19 +7,6 @@
 class Renderer
 {
 public:
-    struct States
-    {
-        unsigned* pIndices = nullptr;
-
-        unsigned texture = 0u;
-        unsigned mode = 0u;
-
-        int firstVertex = 0;
-        int count = 0;
-    };
-    
-
-public:
     Renderer() noexcept;
     ~Renderer();
 
@@ -29,7 +16,8 @@ public:
         object.draw(this);
     }
 
-    void drawStates(const States& states) noexcept;
+    void drawPrimitives(unsigned texture, unsigned mode, int firstVertex, int count) const noexcept;
+    void drawPrimitives(unsigned texture, unsigned mode, int count, int type, const unsigned* indices) const noexcept;
 };
 
 

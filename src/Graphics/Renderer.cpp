@@ -10,21 +10,16 @@ Renderer::~Renderer()
 {
 }
 
-void Renderer::drawStates(const States& states) noexcept
+void Renderer::drawPrimitives(unsigned texture, unsigned mode, int firstVertex, int count) const noexcept
 {
-    if (states.texture)
-    {
-        glBindTexture(GL_TEXTURE_2D, states.texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glDrawArrays(mode, firstVertex, count);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
 
-        if (states.pIndices)
-        {
-            glDrawElements(states.mode, states.count, GL_UNSIGNED_INT, states.pIndices);
-        }
-        else
-        {
-            glDrawArrays(states.mode, states.firstVertex, states.count);
-        }
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+void Renderer::drawPrimitives(unsigned texture, unsigned mode, int count, int type, const unsigned* indices) const noexcept
+{
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glDrawElements(mode, count, type, indices);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
