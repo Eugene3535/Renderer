@@ -87,15 +87,12 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 	auto pTileW = pMapNode->first_attribute("tilewidth");
 	auto pTileH = pMapNode->first_attribute("tileheight");
 
-	const glm::uint32_t map_width   = pMapW  ? std::strtol(pMapW->value(),  nullptr, 10) : 0;
-	const glm::uint32_t map_height  = pMapH  ? std::strtol(pMapH->value(),  nullptr, 10) : 0;
-	const glm::uint32_t tile_width  = pTileW ? std::strtol(pTileW->value(), nullptr, 10) : 0;
-	const glm::uint32_t tile_height = pTileH ? std::strtol(pTileH->value(), nullptr, 10) : 0;
+	const glm::uint32_t map_width   = pMapW  ? std::strtol(pMapW->value(),  nullptr, 10) : 0u;
+	const glm::uint32_t map_height  = pMapH  ? std::strtol(pMapH->value(),  nullptr, 10) : 0u;
+	const glm::uint32_t tile_width  = pTileW ? std::strtol(pTileW->value(), nullptr, 10) : 0u;
+	const glm::uint32_t tile_height = pTileH ? std::strtol(pTileH->value(), nullptr, 10) : 0u;
 
-#ifdef DEBUG
-	if (!map_width || !map_height || !tile_width || !tile_height)
-		return false;
-#endif
+	const glm::uint32_t mapHeightInPixels = map_height * tile_height;
 
 	auto pTileMap = m_tileMaps.back().get();
 
@@ -169,16 +166,16 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 					auto ratio = 1.0f / glm::vec2(pLayer->pTexture->width, pLayer->pTexture->height);
 
 //                  Texture coords
-					float left = offsetX * ratio.x;
-					float top = offsetY * ratio.y;
-					float right = (offsetX + tile_width) * ratio.x;
+					float left   = offsetX * ratio.x;
+					float top    = offsetY * ratio.y;
+					float right  = (offsetX + tile_width) * ratio.x;
 					float bottom = (offsetY + tile_height) * ratio.y;
 
 //                  Vertex coords
-					glm::vec2 leftBottom  = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height + tile_height) };
-					glm::vec2 rightBootom = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height + tile_height) };
-					glm::vec2 rightTop    = { static_cast<float>(x * tile_width + tile_width), static_cast<float>(y * tile_height) };
-					glm::vec2 leftTop     = { static_cast<float>(x * tile_width),              static_cast<float>(y * tile_height) };
+					glm::vec2 leftBottom  = { x * tile_width,              mapHeightInPixels - (y * tile_height + tile_height) };
+					glm::vec2 rightBootom = { x * tile_width + tile_width, mapHeightInPixels - (y * tile_height + tile_height) };
+					glm::vec2 rightTop    = { x * tile_width + tile_width, mapHeightInPixels - y * tile_height };
+					glm::vec2 leftTop     = { x * tile_width,              mapHeightInPixels - y * tile_height };
 
 //                  Index stride
 					std::uint32_t index = static_cast<std::uint32_t>(pLayer->vertices.size());
@@ -212,20 +209,6 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 bool TileMapManager::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
 {
 	auto pTileMap = m_tileMaps.back().get();
-	std::size_t objectAmount = 0u;
-
-	for (auto pObjectGroupNode = pMapNode->first_node("objectgroup");
-			  pObjectGroupNode != nullptr;
-			  pObjectGroupNode = pObjectGroupNode->next_sibling("objectgroup"))
-	{
-		for (auto pObjectNode = pObjectGroupNode->first_node("object");
-				  pObjectNode != nullptr;
-				  pObjectNode = pObjectNode->next_sibling("object"))
-
-			objectAmount++;
-	}
-
-	pTileMap->objects.reserve(objectAmount);
 
 	for (auto pObjectGroupNode = pMapNode->first_node("objectgroup");
 			  pObjectGroupNode != nullptr;
@@ -239,10 +222,10 @@ bool TileMapManager::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexc
 
 			for (auto pAttr = pObjectNode->first_attribute(); pAttr != nullptr; pAttr = pAttr->next_attribute())
 			{
-				if (strcmp(pAttr->name(), "x")      == 0) { tme_object.position.x = std::strtol(pAttr->value(), nullptr, 10); continue; }
-				if (strcmp(pAttr->name(), "y")      == 0) { tme_object.position.y = std::strtol(pAttr->value(), nullptr, 10); continue; }
-				if (strcmp(pAttr->name(), "width")  == 0) { tme_object.size.x     = std::strtol(pAttr->value(), nullptr, 10); continue; }
-				if (strcmp(pAttr->name(), "height") == 0) { tme_object.size.y     = std::strtol(pAttr->value(), nullptr, 10); continue; }
+				if (strcmp(pAttr->name(), "x")      == 0) { tme_object.position.x = std::atoi(pAttr->value()); continue; }
+				if (strcmp(pAttr->name(), "y")      == 0) { tme_object.position.y = std::atoi(pAttr->value()); continue; }
+				if (strcmp(pAttr->name(), "width")  == 0) { tme_object.size.x     = std::atoi(pAttr->value()); continue; }
+				if (strcmp(pAttr->name(), "height") == 0) { tme_object.size.y     = std::atoi(pAttr->value()); continue; }
 
 				if (strcmp(pAttr->name(), "name")  == 0) tme_object.name = pAttr->value();
 				if (strcmp(pAttr->name(), "class") == 0) tme_object.type = pAttr->value();

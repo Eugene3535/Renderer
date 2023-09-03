@@ -55,8 +55,8 @@ public:
 
 		std::vector<Property> properties;
 
-		glm::uvec2 position;
-		glm::uvec2 size;
+		glm::ivec2 position;
+		glm::ivec2 size;
 	};
 
 public:
@@ -65,7 +65,6 @@ public:
 		std::vector<TilePlane> tilePlanes;
 		std::vector<Object>    objects;
 		std::string            name;
-		std::string            collisionMask;	
 		glm::uvec2             mapSize;
 		glm::uvec2             tileSize;
 	};

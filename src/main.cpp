@@ -91,8 +91,8 @@ int main()
     
     int ViewProjection = tilemapShader->getUniformLocation("ViewProjection");
 
-    glm::mat4 projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, -1.0f, 1.0f);
-    glm::mat4 view(glm::identity<glm::mat4>());
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)screen_size.x / (float)screen_size.y, 0.1f, 1000.0f);
+    glm::mat4 view = glm::translate(glm::identity<glm::mat4>(), glm::vec3(0, 0, -500));
 
     glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view));
 
@@ -108,7 +108,7 @@ int main()
     TimeStamp timestamp = Clock::now();
 
     Transform2D model;
-    model.setOrigin(128, 128)->setPosition(400, 300);
+    //model.setScale(1.0f / screen_size.x, 1.0f / screen_size.y);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -131,10 +131,10 @@ int main()
             view = glm::translate(view,glm::vec3(-3, 0, 0) );
 
         if(IsKeyPressed(window, GLFW_KEY_W))
-            view = glm::translate(view,glm::vec3(0, 3, 0) );
+            view = glm::translate(view,glm::vec3(0, -3, 0) );
 
         if(IsKeyPressed(window, GLFW_KEY_S))
-            view = glm::translate(view,glm::vec3(0, -3, 0) );
+            view = glm::translate(view,glm::vec3(0, 3, 0) );
 
         const glm::mat4 viewProjMat { projection * view }; 
 
@@ -153,8 +153,8 @@ int main()
             sprite.setFrame(frameNum);
         }
 
-        model.setRotation(angle++);
-        model.move(1, 0);
+        //model.setRotation(angle++);
+        //model.move(1, 0);
 
         sm.bind();
         Shader::bind(spriteShader);
