@@ -92,8 +92,6 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 	const glm::uint32_t tile_width  = pTileW ? std::strtol(pTileW->value(), nullptr, 10) : 0u;
 	const glm::uint32_t tile_height = pTileH ? std::strtol(pTileH->value(), nullptr, 10) : 0u;
 
-	const glm::uint32_t mapHeightInPixels = map_height * tile_height;
-
 	auto pTileMap = m_tileMaps.back().get();
 
 	pTileMap->mapSize  = glm::uvec2(map_width, map_height);
@@ -172,10 +170,10 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 					float bottom = (offsetY + tile_height) * ratio.y;
 
 //                  Vertex coords
-					glm::vec2 leftBottom  = { x * tile_width,              mapHeightInPixels - (y * tile_height + tile_height) };
-					glm::vec2 rightBootom = { x * tile_width + tile_width, mapHeightInPixels - (y * tile_height + tile_height) };
-					glm::vec2 rightTop    = { x * tile_width + tile_width, mapHeightInPixels - y * tile_height };
-					glm::vec2 leftTop     = { x * tile_width,              mapHeightInPixels - y * tile_height };
+					glm::vec2 leftBottom  = { x * tile_width,              y * tile_height + tile_height };
+					glm::vec2 rightBootom = { x * tile_width + tile_width, y * tile_height + tile_height };
+					glm::vec2 rightTop    = { x * tile_width + tile_width, y * tile_height };
+					glm::vec2 leftTop     = { x * tile_width,              y * tile_height };
 
 //                  Index stride
 					std::uint32_t index = static_cast<std::uint32_t>(pLayer->vertices.size());
