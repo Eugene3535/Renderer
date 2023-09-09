@@ -16,7 +16,8 @@ class SpriteManager:
 public:
 	struct Animation2D
 	{
-		const struct Texture2D* pTexture = nullptr;
+		const struct Texture2D*        pTexture     = nullptr;
+		const std::vector<glm::ivec2>* pSpriteSizes = nullptr;
 
 		unsigned startFrame = 0u;   // Start frame number
 		unsigned duration   = 0u;   // Number of frames

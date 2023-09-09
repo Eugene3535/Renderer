@@ -10,8 +10,8 @@
 #include "Managers/SpriteManager.hpp"
 
 SpriteManager::SpriteManager() noexcept:
-	m_vao(0), 
-	m_vbo(0)
+	m_vao(0u), 
+	m_vbo(0u)
 {
 }
 
@@ -37,10 +37,11 @@ bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTextu
 
 	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
 
-	auto& anim      = it.first->second;
-	anim.pTexture   = pTexture;
-	anim.startFrame = m_vertexBuffer.size() >> 2; 
-	anim.duration   = 1;
+	auto& anim        = it.first->second;
+	anim.pTexture     = pTexture;
+	anim.pSpriteSizes = &m_spriteSizes;
+	anim.startFrame   = m_vertexBuffer.size() >> 2; 
+	anim.duration     = 1;
 
 	createVerticesFromFrame(frame, ratio);
 
@@ -62,12 +63,13 @@ bool SpriteManager::createLinearAnimaton(const std::string &name, const Texture2
 	if (!it.second)
 		return false;
 
-	auto& anim      = it.first->second;
-	anim.pTexture   = pTexture;
-	anim.startFrame = m_vertexBuffer.size() >> 2;
-	anim.duration   = duration;
-	anim.fps        = fps;
-	anim.delay      = delay;
+	auto& anim        = it.first->second;
+	anim.pTexture     = pTexture;
+	anim.pSpriteSizes = &m_spriteSizes;
+	anim.startFrame   = m_vertexBuffer.size() >> 2;
+	anim.duration     = duration;
+	anim.fps          = fps;
+	anim.delay        = delay;
 
 	int frameWidth = pTexture->width / duration;
 	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
@@ -93,12 +95,13 @@ bool SpriteManager::createGridAnimaton(const std::string &name, const Texture2D 
 	if (!it.second)
 		return false;
 
-	auto& anim      = it.first->second;
-	anim.pTexture   = pTexture;
-	anim.startFrame = m_vertexBuffer.size() >> 2;
-	anim.duration   = columns * rows;
-	anim.fps        = fps;
-	anim.delay      = delay;
+	auto& anim        = it.first->second;
+	anim.pTexture     = pTexture;
+	anim.pSpriteSizes = &m_spriteSizes;
+	anim.startFrame   = m_vertexBuffer.size() >> 2;
+	anim.duration     = columns * rows;
+	anim.fps          = fps;
+	anim.delay        = delay;
 
 	int  frameWidth  = pTexture->width / columns;
 	int  frameHeight = pTexture->height / rows;
@@ -159,10 +162,11 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
 		auto pAnim  = &it.first->second;
 		auto pDelay = pAnimNode->first_attribute("delay");
 
-		pAnim->pTexture   = pTexture;
-		pAnim->startFrame = m_vertexBuffer.size() >> 2;
-		pAnim->delay      = pDelay ? std::atoi(pDelay->value()) * 0.001f : 1.0f; // Convert milliseconds to seconds
-		pAnim->fps        = 1.0f / pAnim->delay; // The number of frames shown per second
+		pAnim->pTexture     = pTexture;
+		pAnim->pSpriteSizes = &m_spriteSizes;
+		pAnim->startFrame   = m_vertexBuffer.size() >> 2;
+		pAnim->delay        = pDelay ? std::atoi(pDelay->value()) * 0.001f : 1.0f; // Convert milliseconds to seconds
+		pAnim->fps          = 1.0f / pAnim->delay; // The number of frames shown per second
 
 		auto pCutNode = pAnimNode->first_node("cut");
 
@@ -263,6 +267,7 @@ void SpriteManager::createVerticesFromFrame(const glm::ivec4 &frame, const glm::
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
+	m_spriteSizes.emplace_back(frame.z, frame.w);
 
 	Vertex2D* quad = &m_vertexBuffer[m_vertexBuffer.size() - 4];
 
