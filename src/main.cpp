@@ -86,7 +86,7 @@ int main()
     sprite.setTexture(AssetManager::get<Texture2D>("Explosion.png")->texture);
     sprite.setFrame(0);
 
-    Shader* tilemapShader = AssetManager::get<Shader>("TileMapShader", "TileMap.vert", "TileMap.frag");
+    Shader* tilemapShader = AssetManager::get<Shader>("TileMap", "TileMap.vert", "TileMap.frag");
     Shader::bind(tilemapShader);
     
     int ViewProjection = tilemapShader->getUniformLocation("ViewProjection");
