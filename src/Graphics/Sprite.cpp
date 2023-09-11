@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 
 #include "Graphics/Renderer.hpp"
-#include "Graphics/Primitives/Sprite.hpp"
+#include "Graphics/Sprite.hpp"
 
 Sprite::Sprite() noexcept:
 	m_texture(0u),

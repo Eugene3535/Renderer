@@ -11,13 +11,12 @@
 
 #include "Graphics/Shader.hpp"
 #include "Graphics/Renderer.hpp"
-#include "Graphics/Primitives/Sprite.hpp"
+#include "Graphics/Transform2D.hpp"
+#include "Graphics/Sprite.hpp"
 
 #include "Managers/AssetManager.hpp"
 #include "Managers/SpriteManager.hpp"
 #include "Managers/TileMapManager.hpp"
-
-#include "Graphics/Transform2D.hpp"
 
 using Clock = std::chrono::high_resolution_clock;
 using TimeStamp = std::chrono::time_point<Clock>;
@@ -139,7 +138,7 @@ int main()
 
         Shader::bind(tilemapShader);
         glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(viewProjMat));
-        tm.draw();
+        const_cast<TileMap*>(tmp)->draw();
 
         if(++counter > 2)
         {
