@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include <unordered_map>
+#include <utility>
 
 #include "rapidxml.hpp"
 
@@ -41,7 +42,7 @@ private:
 	std::vector<TilesetData>   parseTilesets(const rapidxml::xml_node<char>* pMapNode)  noexcept;
 	std::vector<glm::uint32_t> parseCSVstring(const rapidxml::xml_node<char>* pMapNode) noexcept;
 
-	void unloadOnGPU(const std::unordered_map<TileMap::TilePlane::TileLayer*, std::vector<Vertex2D>>& vertexMap) noexcept;
+	bool unloadOnGPU(std::unordered_map<TileMap::TilePlane::TileLayer*, std::pair<std::vector<Vertex2D>, std::vector<glm::uint32_t>>>& bufferData) noexcept;
 
 private:
 	std::vector<std::unique_ptr<TileMap>> m_tileMaps;

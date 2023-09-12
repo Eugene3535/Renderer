@@ -13,16 +13,19 @@ public:
 	{
 		struct TileLayer
 		{
-			std::vector<glm::uint32_t> indices;
-
 			const struct Texture2D* pTexture = nullptr;
 
-			glm::uint32_t vao = 0u;
-			glm::uint32_t vbo = 0u;
+			glm::uint32_t start = 0u;
+			glm::uint32_t end   = 0u;
+			glm::uint32_t count = 0u;
 		};
 
 		std::string            name;
 		std::vector<TileLayer> tileLayers;
+
+		glm::uint32_t vao = 0u; // Vertex array object
+		glm::uint32_t vbo = 0u; // Vertex buffer object
+		glm::uint32_t ibo = 0u; // Index buffer object
 	};
 
 public:

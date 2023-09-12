@@ -3,7 +3,6 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include <set>
 
 #include "rapidxml_utils.hpp"
 
@@ -92,7 +91,7 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 	pTileMap->m_mapSize  = { map_width, map_height };
 	pTileMap->m_tileSize = { tile_width, tile_height };
 
-	std::unordered_map<TileMap::TilePlane::TileLayer*, std::vector<Vertex2D>> vertexMap;
+//	std::unordered_map<TileMap::TilePlane::TileLayer*, std::vector<Vertex2D>> vertexMap;
 
 	for (auto pLayerNode = pMapNode->first_node("layer");
 			  pLayerNode != nullptr;
@@ -113,29 +112,10 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 
 		auto& plane = pTileMap->m_tilePlanes.emplace_back();
 		plane.name = name;
-// Reserve memory for all layers in plane( fix for invalid pointer after std::vector::resize() )
-		{
-			auto cmp = [](const glm::uvec2& a, const glm::uvec2& b) { return a.x < b.x && a.y < b.y; };
+		plane.tileLayers.reserve(tilesets.size());
 
-			std::set<glm::uvec2, decltype(cmp)> bounds(cmp);
-
-			for (auto tileNum : parsed_layer)
-			{
-				// Need to find from what tileset this tile is
-				if (tileNum)
-				{
-					auto from = std::find_if(tilesets.cbegin(), tilesets.cend(),
-						[tileNum](const TilesetData& ts)
-						{
-							return tileNum >= ts.firstGID && tileNum <= ts.firstGID + ts.tileCount;
-						});
-					// Find the range of this tileset
-					bounds.insert(glm::uvec2(from->firstGID, from->firstGID + from->tileCount));
-				}
-			}
-
-			plane.tileLayers.reserve(bounds.size());
-		}
+		using BufferData = std::pair<std::vector<Vertex2D>, std::vector<glm::uint32_t>>;
+		std::unordered_map<TileMap::TilePlane::TileLayer*, BufferData> bufferData;
 
 		for (glm::uint32_t y = 0u; y < map_height; ++y)
 			for (glm::uint32_t x = 0u; x < map_width; ++x)
@@ -168,7 +148,8 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 						pLayer->pTexture = current_tileset->pTexture;
 					}
 
-					auto& vertices = vertexMap[pLayer];
+					auto& vertices = bufferData[pLayer].first;
+					auto& indices  = bufferData[pLayer].second;
 
 // Find the sequence tile number in this tileset
 					glm::uint32_t tile_num = tile_id - current_tileset->firstGID;
@@ -199,18 +180,20 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 					vertices.emplace_back(rightTop.x, rightTop.y, right, top);
 					vertices.emplace_back(leftTop.x, leftTop.y, left, top);
 // 1-st triangle
-					pLayer->indices.push_back(index);
-					pLayer->indices.push_back(index + 1);
-					pLayer->indices.push_back(index + 2);
+					indices.push_back(index);
+					indices.push_back(index + 1);
+					indices.push_back(index + 2);
 // 2-nd triangle
-					pLayer->indices.push_back(index);
-					pLayer->indices.push_back(index + 2);
-					pLayer->indices.push_back(index + 3);
+					indices.push_back(index);
+					indices.push_back(index + 2);
+					indices.push_back(index + 3);
 				}
 			}
+
+		unloadOnGPU(bufferData);
 	}
 
-	unloadOnGPU(vertexMap);
+//	unloadOnGPU(vertexMap);
 
 	return !pTileMap->m_tilePlanes.empty();
 }
@@ -325,25 +308,79 @@ std::vector<glm::uint32_t> TileMapManager::parseCSVstring(const rapidxml::xml_no
 	return parsed_layer;
 }
 
-void TileMapManager::unloadOnGPU(const std::unordered_map<TileMap::TilePlane::TileLayer*, std::vector<Vertex2D>>& vertexMap) noexcept
+bool TileMapManager::unloadOnGPU(std::unordered_map<TileMap::TilePlane::TileLayer*, std::pair<std::vector<Vertex2D>, std::vector<glm::uint32_t>>>& bufferData) noexcept
 {
-	for(const auto& [layer, vertices] : vertexMap)
+	auto pTileMap = m_tileMaps.back().get();
+	auto& plane = pTileMap->m_tilePlanes.back();
+
+	size_t vertexCount = 0;
+	size_t indexCount = 0;
+
+	for (const auto& data : bufferData)
 	{
-		glGenVertexArrays(1, &layer->vao);
-		glGenBuffers(1, &layer->vbo);
+		vertexCount += data.second.first.size();
+		indexCount  += data.second.second.size();
+	}
+		
+	glGenVertexArrays(1, &plane.vao);
+	glGenBuffers(1, &plane.vbo);
+	glGenBuffers(1, &plane.ibo);
 
-		glBindVertexArray(layer->vao);
+	glBindVertexArray(plane.vao);
 
-		glBindBuffer(GL_ARRAY_BUFFER, layer->vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, plane.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * vertexCount, nullptr, GL_STATIC_DRAW);
 
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
-		glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
+	glEnableVertexAttribArray(0);
 
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, texCoords));
-		glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, texCoords));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, plane.ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uint32_t) * indexCount, nullptr, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	std::size_t vertexStride = 0u;
+	std::size_t indexStride = 0u;
+
+	for (const auto& [layer, pair] : bufferData)
+	{
+		const auto& vertices = pair.first;
+		const auto& indices  = pair.second;
+
+//      Fill the vertex buffer
+		glBindBuffer(GL_ARRAY_BUFFER, plane.vbo);
+		Vertex2D* pVertices = reinterpret_cast<Vertex2D*>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
+		pVertices += vertexStride;
+		memcpy(pVertices, vertices.data(), sizeof(Vertex2D) * vertices.size());
+
+		if(glUnmapBuffer(GL_ARRAY_BUFFER) != GL_TRUE)
+			return false;
 
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
+
+//      Fill the index buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, plane.ibo);
+		glm::uint32_t* pIndices = reinterpret_cast<glm::uint32_t*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY));
+		pIndices += indexStride;
+		memcpy(pIndices, indices.data(), sizeof(glm::uint32_t) * indices.size());
+
+		if (!glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER))
+			return false;
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+//		Calculate the stride
+		layer->start = indexStride;
+		layer->count = indices.size();
+		layer->end   = layer->count;
+
+		vertexStride += vertices.size();
+		indexStride += indices.size();	
 	}
+	glBindVertexArray(0);
+
+	return true;
 }
