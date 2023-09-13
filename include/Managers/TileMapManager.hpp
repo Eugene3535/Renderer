@@ -42,7 +42,7 @@ private:
 	std::vector<TilesetData>   parseTilesets(const rapidxml::xml_node<char>* pMapNode)  noexcept;
 	std::vector<glm::uint32_t> parseCSVstring(const rapidxml::xml_node<char>* pMapNode) noexcept;
 
-	bool unloadOnGPU(std::unordered_map<TileMap::TilePlane::TileLayer*, std::pair<std::vector<Vertex2D>, std::vector<glm::uint32_t>>>& bufferData) noexcept;
+	void unloadOnGPU(const std::vector<Vertex2D>& vertices, const std::vector<glm::uint32_t>& indices) noexcept;
 
 private:
 	std::vector<std::unique_ptr<TileMap>> m_tileMaps;

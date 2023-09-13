@@ -91,8 +91,6 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 	pTileMap->m_mapSize  = { map_width, map_height };
 	pTileMap->m_tileSize = { tile_width, tile_height };
 
-//	std::unordered_map<TileMap::TilePlane::TileLayer*, std::vector<Vertex2D>> vertexMap;
-
 	for (auto pLayerNode = pMapNode->first_node("layer");
 			  pLayerNode != nullptr;
 			  pLayerNode = pLayerNode->next_sibling("layer"))
@@ -110,12 +108,31 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 
 		std::vector<glm::uint32_t> parsed_layer = parseCSVstring(pDataNode);
 
-		auto& plane = pTileMap->m_tilePlanes.emplace_back();
-		plane.name = name;
-		plane.tileLayers.reserve(tilesets.size());
+		std::size_t non_zero_tile_count = std::count_if(parsed_layer.begin(), parsed_layer.end(),
+			[](glm::uint32_t n) { return n > 0u; });
 
-		using BufferData = std::pair<std::vector<Vertex2D>, std::vector<glm::uint32_t>>;
-		std::unordered_map<TileMap::TilePlane::TileLayer*, BufferData> bufferData;
+		const auto [minTile, maxTile] = std::minmax_element(parsed_layer.begin(), parsed_layer.end());
+
+		auto currentTileset = std::find_if(tilesets.begin(), tilesets.end(),
+			[minTile, maxTile](const TilesetData& ts)
+			{
+				return *minTile <= ts.firstGID && *maxTile <= ts.firstGID + ts.tileCount;
+			});
+
+		if(currentTileset == tilesets.end())
+			continue;
+
+		auto& layer = pTileMap->m_tileLayers.emplace_back();
+		layer.name = name;
+		layer.texture = currentTileset->pTexture->texture;
+
+		std::vector<Vertex2D> vertices;
+		std::vector<glm::uint32_t> indices;
+
+		vertices.reserve(non_zero_tile_count * 4);
+		indices.reserve(non_zero_tile_count * 6);
+
+		auto ratio = 1.0f / glm::vec2(currentTileset->pTexture->width, currentTileset->pTexture->height);
 
 		for (glm::uint32_t y = 0u; y < map_height; ++y)
 			for (glm::uint32_t x = 0u; x < map_width; ++x)
@@ -124,78 +141,44 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 
 				if (tile_id)
 				{
-// Need to find from what tileset this tile is
-					auto current_tileset = std::find_if(tilesets.begin(), tilesets.end(),
-						[tile_id](const TilesetData& ts)
-						{
-							return tile_id >= ts.firstGID && tile_id <= ts.firstGID + ts.tileCount;
-						});
+					glm::uint32_t tile_num = tile_id - currentTileset->firstGID;
 
-// Is there associated tile layer for this tileset?
-					auto current_layer = std::find_if(plane.tileLayers.begin(), plane.tileLayers.end(),
-						[&current_tileset](const TileMap::TilePlane::TileLayer& layer)
-						{
-							return current_tileset->pTexture == layer.pTexture;
-						});
-
-					TileMap::TilePlane::TileLayer* pLayer = nullptr;
-// If not - we will create it
-					if (current_layer != plane.tileLayers.end())
-						pLayer = std::addressof(*current_layer);
-					else
-					{
-						pLayer = std::addressof(plane.tileLayers.emplace_back());
-						pLayer->pTexture = current_tileset->pTexture;
-					}
-
-					auto& vertices = bufferData[pLayer].first;
-					auto& indices  = bufferData[pLayer].second;
-
-// Find the sequence tile number in this tileset
-					glm::uint32_t tile_num = tile_id - current_tileset->firstGID;
-
-// Left-top coords of the tile in texture grid
-					glm::uint32_t Y = (tile_num >= current_tileset->columns) ? tile_num / current_tileset->columns : 0;
-					glm::uint32_t X = tile_num % current_tileset->columns;
+					glm::uint32_t Y = (tile_num >= currentTileset->columns) ? tile_num / currentTileset->columns : 0u;
+					glm::uint32_t X = tile_num % currentTileset->columns;
 
 					glm::uint32_t offsetX = X * tile_width;
 					glm::uint32_t offsetY = Y * tile_height;
 
-					auto ratio = 1.0f / glm::vec2(pLayer->pTexture->width, pLayer->pTexture->height);
-// Texture coords
 					float left   = offsetX * ratio.x;
 					float top    = offsetY * ratio.y;
 					float right  = (offsetX + tile_width) * ratio.x;
 					float bottom = (offsetY + tile_height) * ratio.y;
-// Vertex coords
+
 					glm::vec2 leftBottom  = { x * tile_width,              y * tile_height + tile_height };
 					glm::vec2 rightBootom = { x * tile_width + tile_width, y * tile_height + tile_height };
 					glm::vec2 rightTop    = { x * tile_width + tile_width, y * tile_height };
 					glm::vec2 leftTop     = { x * tile_width,              y * tile_height };
-// Index stride
+
 					glm::uint32_t index = static_cast<glm::uint32_t>(vertices.size());
-// Quad
+
 					vertices.emplace_back(leftBottom.x, leftBottom.y, left, bottom);
 					vertices.emplace_back(rightBootom.x, rightBootom.y, right, bottom);
 					vertices.emplace_back(rightTop.x, rightTop.y, right, top);
 					vertices.emplace_back(leftTop.x, leftTop.y, left, top);
-// 1-st triangle
+
 					indices.push_back(index);
 					indices.push_back(index + 1);
 					indices.push_back(index + 2);
-// 2-nd triangle
+
 					indices.push_back(index);
 					indices.push_back(index + 2);
 					indices.push_back(index + 3);
 				}
 			}
-
-		unloadOnGPU(bufferData);
+		unloadOnGPU(vertices, indices);
 	}
 
-//	unloadOnGPU(vertexMap);
-
-	return !pTileMap->m_tilePlanes.empty();
+	return true;
 }
 
 bool TileMapManager::loadObjects(const rapidxml::xml_node<char>* pMapNode) noexcept
@@ -278,10 +261,10 @@ std::vector<TileMapManager::TilesetData> TileMapManager::parseTilesets(const rap
 		auto pFirstGID  = pTilesetNode->first_attribute("firstgid");
 
 		ts.pTexture  = pTileset;
-		ts.tileCount = pTileCount ? std::stoul(pTileCount->value()) : 0;
-		ts.columns   = pColumns ? std::stoul(pColumns->value()) : 0;
-		ts.rows      = ( ! pTileCount || ! pColumns ) ? 0 : ts.tileCount / ts.columns;
-		ts.firstGID  = pFirstGID ? std::stoul(pFirstGID->value()) : 0;
+		ts.tileCount = pTileCount ? std::stoul(pTileCount->value()) : 0u;
+		ts.columns   = pColumns ? std::stoul(pColumns->value()) : 0u;
+		ts.rows      = ( ! pTileCount || ! pColumns ) ? 0u : ts.tileCount / ts.columns;
+		ts.firstGID  = pFirstGID ? std::stoul(pFirstGID->value()) : 0u;
 	}
 
 	return tilesets;
@@ -308,28 +291,22 @@ std::vector<glm::uint32_t> TileMapManager::parseCSVstring(const rapidxml::xml_no
 	return parsed_layer;
 }
 
-bool TileMapManager::unloadOnGPU(std::unordered_map<TileMap::TilePlane::TileLayer*, std::pair<std::vector<Vertex2D>, std::vector<glm::uint32_t>>>& bufferData) noexcept
+void TileMapManager::unloadOnGPU(const std::vector<Vertex2D>& vertices, const std::vector<glm::uint32_t>& indices) noexcept
 {
-	auto pTileMap = m_tileMaps.back().get();
-	auto& plane = pTileMap->m_tilePlanes.back();
+	if(m_tileMaps.empty())
+		return;
 
-	size_t vertexCount = 0;
-	size_t indexCount = 0;
+	auto& layer = m_tileMaps.back()->m_tileLayers.back();
+	layer.count = indices.size();
 
-	for (const auto& data : bufferData)
-	{
-		vertexCount += data.second.first.size();
-		indexCount  += data.second.second.size();
-	}
-		
-	glGenVertexArrays(1, &plane.vao);
-	glGenBuffers(1, &plane.vbo);
-	glGenBuffers(1, &plane.ibo);
+	glGenVertexArrays(1, &layer.vao);
+	glGenBuffers(1, &layer.vbo);
+	glGenBuffers(1, &layer.ebo);
 
-	glBindVertexArray(plane.vao);
+	glBindVertexArray(layer.vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, plane.vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * vertexCount, nullptr, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, layer.vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * vertices.size() * 4, vertices.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
 	glEnableVertexAttribArray(0);
@@ -337,50 +314,8 @@ bool TileMapManager::unloadOnGPU(std::unordered_map<TileMap::TilePlane::TileLaye
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (void*)offsetof(Vertex2D, texCoords));
 	glEnableVertexAttribArray(1);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, plane.ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uint32_t) * indexCount, nullptr, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, layer.ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uint32_t) * indices.size() * 6, indices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	std::size_t vertexStride = 0u;
-	std::size_t indexStride = 0u;
-
-	for (const auto& [layer, pair] : bufferData)
-	{
-		const auto& vertices = pair.first;
-		const auto& indices  = pair.second;
-
-//      Fill the vertex buffer
-		glBindBuffer(GL_ARRAY_BUFFER, plane.vbo);
-		Vertex2D* pVertices = reinterpret_cast<Vertex2D*>(glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY));
-		pVertices += vertexStride;
-		memcpy(pVertices, vertices.data(), sizeof(Vertex2D) * vertices.size());
-
-		if(glUnmapBuffer(GL_ARRAY_BUFFER) != GL_TRUE)
-			return false;
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-//      Fill the index buffer
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, plane.ibo);
-		glm::uint32_t* pIndices = reinterpret_cast<glm::uint32_t*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY));
-		pIndices += indexStride;
-		memcpy(pIndices, indices.data(), sizeof(glm::uint32_t) * indices.size());
-
-		if (!glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER))
-			return false;
-
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-//		Calculate the stride
-		layer->start = indexStride;
-		layer->count = indices.size();
-		layer->end   = layer->count;
-
-		vertexStride += vertices.size();
-		indexStride += indices.size();	
-	}
-	glBindVertexArray(0);
-
-	return true;
 }

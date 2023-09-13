@@ -9,23 +9,15 @@
 class TileMap
 {
 public:
-	struct TilePlane
+	struct TileLayer
 	{
-		struct TileLayer
-		{
-			const struct Texture2D* pTexture = nullptr;
+		std::string name;
 
-			glm::uint32_t start = 0u;
-			glm::uint32_t end   = 0u;
-			glm::uint32_t count = 0u;
-		};
-
-		std::string            name;
-		std::vector<TileLayer> tileLayers;
-
-		glm::uint32_t vao = 0u; // Vertex array object
-		glm::uint32_t vbo = 0u; // Vertex buffer object
-		glm::uint32_t ibo = 0u; // Index buffer object
+		glm::uint32_t texture = 0u; // Texture handle
+		glm::uint32_t count   = 0u; // Number of indices to render
+		glm::uint32_t vao     = 0u; // Vertex array object
+		glm::uint32_t vbo     = 0u; // Vertex buffer object
+		glm::uint32_t ebo     = 0u; // Element buffer object
 	};
 
 public:
@@ -51,7 +43,7 @@ public:
 	TileMap() noexcept;
 	~TileMap();
 
-	const std::vector<TilePlane>& getTilePlanes() const noexcept;
+	const std::vector<TileLayer>& getTileLayers() const noexcept;
 	const std::vector<Object>&    getObjects()    const noexcept;
 	std::vector<const Object*>    getObjectsByName(const std::string&) const noexcept;
 	std::vector<const Object*>    getObjectsByType(const std::string&) const noexcept;
@@ -63,7 +55,7 @@ public:
 	void draw() noexcept;
 
 private:
-    std::vector<TilePlane> m_tilePlanes;
+    std::vector<TileLayer> m_tileLayers;
     std::vector<Object>    m_objects;
     std::string            m_name;
     glm::uvec2             m_mapSize;

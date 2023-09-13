@@ -107,6 +107,7 @@ int main()
     TimeStamp timestamp = Clock::now();
 
     Transform2D model;
+    model.setPosition(550, 10);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -123,16 +124,16 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         if(IsKeyPressed(window, GLFW_KEY_A))
-            view = glm::translate(view,glm::vec3(3, 0, 0) );
+            view = glm::translate(view,glm::vec3(6, 0, 0) );
 
         if(IsKeyPressed(window, GLFW_KEY_D))
-            view = glm::translate(view,glm::vec3(-3, 0, 0) );
+            view = glm::translate(view,glm::vec3(-6, 0, 0) );
 
         if(IsKeyPressed(window, GLFW_KEY_W))
-            view = glm::translate(view,glm::vec3(0, 3, 0) );
+            view = glm::translate(view,glm::vec3(0, 6, 0) );
 
         if(IsKeyPressed(window, GLFW_KEY_S))
-            view = glm::translate(view,glm::vec3(0, -3, 0) );
+            view = glm::translate(view,glm::vec3(0, -6, 0) );
 
         const glm::mat4 viewProjMat { projection * view }; 
 

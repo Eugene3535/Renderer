@@ -10,22 +10,22 @@ TileMap::TileMap() noexcept
 
 TileMap::~TileMap()
 {
-	for (auto& plane : m_tilePlanes)
+	for (auto& layer : m_tileLayers)
 	{
-		if(plane.vao)
-			glDeleteVertexArrays(1, &plane.vao);
+		if(layer.vao)
+			glDeleteVertexArrays(1, &layer.vao);
 
-		if(plane.vbo)
-			glDeleteBuffers(1, &plane.vbo);
+		if(layer.vbo)
+			glDeleteBuffers(1, &layer.vbo);
 
-		if (plane.ibo)
-			glDeleteBuffers(1, &plane.ibo);
+		if (layer.ebo)
+			glDeleteBuffers(1, &layer.ebo);
 	}		
 }
 
-const std::vector<TileMap::TilePlane>& TileMap::getTilePlanes() const noexcept
+const std::vector<TileMap::TileLayer>& TileMap::getTileLayers() const noexcept
 {
-	return m_tilePlanes;
+	return m_tileLayers;
 }
 
 const std::vector<TileMap::Object>& TileMap::getObjects() const noexcept
@@ -70,19 +70,19 @@ glm::uvec2 TileMap::getMapSizeInPixels() const noexcept
 	return { m_mapSize.x * m_tileSize.x, m_mapSize.y * m_tileSize.y };
 }
 
+// TODO //  Optimize !!!!!!!!!!!!!!!!!! draw(TileLayer)
+
 void TileMap::draw() noexcept
 {
-	for (auto& plane : m_tilePlanes)
+	for (const auto& layer : m_tileLayers)
 	{
-		glBindVertexArray(plane.vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, plane.ibo);
+		glBindVertexArray(layer.vao);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, layer.ebo);
 
-		for (auto& layer : plane.tileLayers)
-		{
-			glBindTexture(GL_TEXTURE_2D, layer.pTexture->texture);
-			glDrawRangeElements(GL_TRIANGLES, layer.start, layer.end, layer.count, GL_UNSIGNED_INT, nullptr);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
+		glBindTexture(GL_TEXTURE_2D, layer.texture);
+		glDrawElements(GL_TRIANGLES, layer.count, GL_UNSIGNED_INT, nullptr);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
