@@ -132,7 +132,7 @@ bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) no
 		vertices.reserve(non_zero_tile_count * 4);
 		indices.reserve(non_zero_tile_count * 6);
 
-		auto ratio = 1.0f / glm::vec2(currentTileset->pTexture->width, currentTileset->pTexture->height);
+		auto ratio = 1.0f / glm::vec2(currentTileset->pTexture->size);
 
 		for (glm::uint32_t y = 0u; y < map_height; ++y)
 			for (glm::uint32_t x = 0u; x < map_width; ++x)

@@ -7,36 +7,36 @@
 
 #include <glad/glad.h>
 
-bool LoadImageFromFile(const std::string& filepath, std::vector<unsigned char>& pixels, int& width, int& height)
+bool LoadImageFromFile(const std::string& filepath, std::vector<glm::uint8_t>& pixels, glm::ivec2& size)
 {
     pixels.clear();
 
-    int bytePerPixel = 0;
-    unsigned char* pData = stbi_load(filepath.c_str(), &width, &height, &bytePerPixel, STBI_rgb_alpha);
+    std::int32_t bytePerPixel = 0;
+    glm::uint8_t* pData = stbi_load(filepath.c_str(), &size.x, &size.y, &bytePerPixel, STBI_rgb_alpha);
 
     if (!pData)
         return false;
 
-    pixels.resize(static_cast<size_t>(width * height * 4));
+    pixels.resize(static_cast<size_t>(size.x * size.y * 4));
     std::memcpy(&pixels[0], pData, pixels.size());
     stbi_image_free(pData);
 
     return true;
 }
 
-void CreateTextureFromImage(const std::vector<unsigned char>& pixels, Texture2D& texture)
+void CreateTextureFromImage(const std::vector<glm::uint8_t>& pixels, Texture2D& texture)
 {
-	unsigned* pTexture = &texture.texture;
+	glm::uint32_t* pTexture = &texture.texture;
 
 	glGenTextures(1, pTexture);
 
 	glBindTexture(GL_TEXTURE_2D, *pTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.size.x, texture.size.y, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
 	glGenerateMipmap(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void SetTexture2DRepeated(unsigned texture, bool repeat)
+void SetTexture2DRepeated(glm::uint32_t texture, bool repeat)
 {
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -58,7 +58,7 @@ void SetTexture2DRepeated(unsigned texture, bool repeat)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void SetTexture2DSmooth(unsigned texture, bool smooth)
+void SetTexture2DSmooth(glm::uint32_t texture, bool smooth)
 {
     glBindTexture(GL_TEXTURE_2D, texture);
 

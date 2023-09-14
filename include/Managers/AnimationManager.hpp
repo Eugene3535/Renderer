@@ -1,5 +1,5 @@
-#ifndef SPRITE_MANAGER_HPP
-#define SPRITE_MANAGER_HPP
+#ifndef ANIMATION_MANAGER_HPP
+#define ANIMATION_MANAGER_HPP
 
 #include <string>
 #include <vector>
@@ -10,14 +10,14 @@
 #include "Graphics/Vertex2D.hpp"
 #include "Managers/Base/Manager.hpp"
 
-class SpriteManager:
+class AnimationManager:
 	public Manager
 {
 public:
 	struct Animation2D
 	{
-		const struct Texture2D*        pTexture     = nullptr;
-		const std::vector<glm::ivec2>* pSpriteSizes = nullptr;
+		const struct Texture2D*        pTexture    = nullptr;
+		const std::vector<glm::ivec2>* pFrameSizes = nullptr;
 
 		unsigned startFrame = 0u;   // Start frame number
 		unsigned duration   = 0u;   // Number of frames
@@ -29,8 +29,8 @@ public:
 	using SpriteSheet = std::unordered_map<std::string, Animation2D*>;
 
 public:
-	SpriteManager() noexcept;
-	~SpriteManager();
+	AnimationManager() noexcept;
+	~AnimationManager();
 
 	bool createFrame(const std::string& name, const struct Texture2D* pTexture, const glm::ivec4& frame) noexcept;
 	bool createLinearAnimaton(const std::string& name, const struct Texture2D* pTexture, int duration, int fps, float delay = 1.0f) noexcept;
@@ -53,7 +53,7 @@ private:
 	std::unordered_map<std::string, SpriteSheet> m_spriteSheets;
 
 	std::vector<Vertex2D>   m_vertexBuffer;
-	std::vector<glm::ivec2> m_spriteSizes;
+	std::vector<glm::ivec2> m_frameSizes;
 
 	unsigned m_vao;
 	unsigned m_vbo;

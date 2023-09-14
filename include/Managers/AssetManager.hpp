@@ -90,7 +90,7 @@ private:
                     std::vector<unsigned char> pixels;
                     auto& texture = iterator->second;
 
-                    if(!LoadImageFromFile(filepath, pixels, texture.width, texture.height))
+                    if(!LoadImageFromFile(filepath, pixels, texture.size))
                     {
                         container.erase(filename);
                     }

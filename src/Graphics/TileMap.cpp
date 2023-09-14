@@ -70,20 +70,15 @@ glm::uvec2 TileMap::getMapSizeInPixels() const noexcept
 	return { m_mapSize.x * m_tileSize.x, m_mapSize.y * m_tileSize.y };
 }
 
-// TODO //  Optimize !!!!!!!!!!!!!!!!!! draw(TileLayer)
-
-void TileMap::draw() noexcept
+void TileMap::draw(const TileLayer& layer) const noexcept
 {
-	for (const auto& layer : m_tileLayers)
-	{
-		glBindVertexArray(layer.vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, layer.ebo);
+	glBindVertexArray(layer.vao);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, layer.ebo);
 
-		glBindTexture(GL_TEXTURE_2D, layer.texture);
-		glDrawElements(GL_TRIANGLES, layer.count, GL_UNSIGNED_INT, nullptr);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-	}
+	glBindTexture(GL_TEXTURE_2D, layer.texture);
+	glDrawElements(GL_TRIANGLES, layer.count, GL_UNSIGNED_INT, nullptr);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }

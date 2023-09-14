@@ -10,16 +10,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Graphics/Shader.hpp"
-#include "Graphics/Renderer.hpp"
 #include "Graphics/Transform2D.hpp"
 #include "Graphics/Sprite.hpp"
 
 #include "Managers/AssetManager.hpp"
-#include "Managers/SpriteManager.hpp"
+#include "Managers/AnimationManager.hpp"
 #include "Managers/TileMapManager.hpp"
-
-using Clock = std::chrono::high_resolution_clock;
-using TimeStamp = std::chrono::time_point<Clock>;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 bool IsKeyPressed(GLFWwindow* window, const int key);
@@ -43,7 +39,7 @@ int main()
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSwapInterval(0);
+    glfwSwapInterval(1);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -70,10 +66,8 @@ int main()
         }, 0 );
 #endif
 
-    Renderer renderer;
-
     AssetManager al;
-    SpriteManager sm;
+    AnimationManager sm;
     TileMapManager tm;
 
     sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 30);
@@ -104,22 +98,10 @@ int main()
     int frameNum = 0;
     int angle = 0;
 
-    TimeStamp timestamp = Clock::now();
-
-    Transform2D model;
-    model.setPosition(550, 10);
+    sprite.setPosition(550, 10);
 
     while (!glfwWindowShouldClose(window))
     {
-        const auto dt = Clock::now() - timestamp;
-
-        if (dt < std::chrono::milliseconds(10)) 
-        { 
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            continue;
-        }
-        timestamp = Clock::now();
-
         glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -139,14 +121,16 @@ int main()
 
         Shader::bind(tilemapShader);
         glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(viewProjMat));
-        const_cast<TileMap*>(tmp)->draw();
 
-        if(++counter > 2)
+        for(const auto& layer : tmp->getTileLayers())
+            tmp->draw(layer);
+
+        //if(++counter > 2)
         {
             counter  = 0;
             frameNum++;
 
-            if(frameNum >= 48)
+            if(frameNum > 47)
                 frameNum = 0;
 
             sprite.setFrame(frameNum);
@@ -157,8 +141,8 @@ int main()
 
         sm.bind();
         Shader::bind(spriteShader);
-        glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(viewProjMat * model.getMatrix()));
-        renderer.draw(sprite);
+        glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(viewProjMat * sprite.getMatrix()));
+        sprite.draw();
         sm.unbind();
 
         glfwSwapBuffers(window);

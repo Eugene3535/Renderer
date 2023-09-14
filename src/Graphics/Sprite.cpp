@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 
-#include "Graphics/Renderer.hpp"
 #include "Graphics/Sprite.hpp"
 
 Sprite::Sprite() noexcept:
@@ -9,18 +8,32 @@ Sprite::Sprite() noexcept:
 {
 }
 
-void Sprite::setTexture(unsigned texture) noexcept
+void Sprite::setTexture(glm::uint32_t texture) noexcept
 {
 	m_texture = texture;
 }
 
-void Sprite::setFrame(unsigned frameNum) noexcept
+void Sprite::setFrame(glm::uint32_t frameNum) noexcept
 {
 	m_frame = frameNum;
 }
 
-void Sprite::draw(Renderer* renderer) noexcept
+glm::uint32_t Sprite::getTexture() const noexcept
+{
+    return m_texture;
+}
+
+glm::uint32_t Sprite::getFrameNum() const noexcept
+{
+    return m_frame;
+}
+
+void Sprite::draw() const noexcept
 {
 	if(m_texture)
-		renderer->drawPrimitives(m_texture, GL_TRIANGLE_FAN, (m_frame << 2), 4);
+	{
+		glBindTexture(GL_TEXTURE_2D, m_texture);
+		glDrawArrays(GL_TRIANGLE_FAN, (m_frame << 2), 4);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}		
 }

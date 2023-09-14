@@ -52,7 +52,7 @@ public:
 	const glm::uvec2& getTileSize()        const noexcept;
 	glm::uvec2        getMapSizeInPixels() const noexcept;
 
-	void draw() noexcept;
+	void draw(const TileLayer& layer) const noexcept;
 
 private:
     std::vector<TileLayer> m_tileLayers;

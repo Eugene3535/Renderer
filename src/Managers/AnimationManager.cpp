@@ -7,20 +7,20 @@
 
 #include "Utils/Files.hpp"
 #include "Graphics/Texture2D.hpp"
-#include "Managers/SpriteManager.hpp"
+#include "Managers/AnimationManager.hpp"
 
-SpriteManager::SpriteManager() noexcept:
+AnimationManager::AnimationManager() noexcept:
 	m_vao(0u), 
 	m_vbo(0u)
 {
 }
 
-SpriteManager::~SpriteManager()
+AnimationManager::~AnimationManager()
 {
 	release();
 }
 
-bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTexture, const glm::ivec4 &frame) noexcept
+bool AnimationManager::createFrame(const std::string& name, const Texture2D *pTexture, const glm::ivec4 &frame) noexcept
 {
 	if (!pTexture)
 		return false;
@@ -35,20 +35,20 @@ bool SpriteManager::createFrame(const std::string& name, const Texture2D *pTextu
 	if( ! it.second )
 		return false;
 
-	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
+	auto ratio = 1.0f / glm::vec2(pTexture->size);
 
-	auto& anim        = it.first->second;
-	anim.pTexture     = pTexture;
-	anim.pSpriteSizes = &m_spriteSizes;
-	anim.startFrame   = m_vertexBuffer.size() >> 2; 
-	anim.duration     = 1;
+	auto& anim       = it.first->second;
+	anim.pTexture    = pTexture;
+	anim.pFrameSizes = &m_frameSizes;
+	anim.startFrame  = m_vertexBuffer.size() >> 2; 
+	anim.duration    = 1;
 
 	createVerticesFromFrame(frame, ratio);
 
 	return true;
 }
 
-bool SpriteManager::createLinearAnimaton(const std::string &name, const Texture2D *pTexture, int duration, int fps, float delay) noexcept
+bool AnimationManager::createLinearAnimaton(const std::string &name, const Texture2D *pTexture, int duration, int fps, float delay) noexcept
 {
 	if (!pTexture)
 		return false;
@@ -63,24 +63,24 @@ bool SpriteManager::createLinearAnimaton(const std::string &name, const Texture2
 	if (!it.second)
 		return false;
 
-	auto& anim        = it.first->second;
-	anim.pTexture     = pTexture;
-	anim.pSpriteSizes = &m_spriteSizes;
-	anim.startFrame   = m_vertexBuffer.size() >> 2;
-	anim.duration     = duration;
-	anim.fps          = fps;
-	anim.delay        = delay;
+	auto& anim       = it.first->second;
+	anim.pTexture    = pTexture;
+	anim.pFrameSizes = &m_frameSizes;
+	anim.startFrame  = m_vertexBuffer.size() >> 2;
+	anim.duration    = duration;
+	anim.fps         = fps;
+	anim.delay       = delay;
 
-	int frameWidth = pTexture->width / duration;
-	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
+	int frameWidth = pTexture->size.x / duration;
+	auto ratio = 1.0f / glm::vec2(pTexture->size);
 
 	for (int i = 0; i < duration; ++i)
-		createVerticesFromFrame(glm::ivec4(i * frameWidth, 0, frameWidth, pTexture->height), ratio);
+		createVerticesFromFrame(glm::ivec4(i * frameWidth, 0, frameWidth, pTexture->size.y), ratio);
 	
     return true;
 }
 
-bool SpriteManager::createGridAnimaton(const std::string &name, const Texture2D *pTexture, int columns, int rows, int fps, float delay) noexcept
+bool AnimationManager::createGridAnimaton(const std::string &name, const Texture2D *pTexture, int columns, int rows, int fps, float delay) noexcept
 {
 	if(!pTexture)
 		return false;
@@ -95,17 +95,17 @@ bool SpriteManager::createGridAnimaton(const std::string &name, const Texture2D 
 	if (!it.second)
 		return false;
 
-	auto& anim        = it.first->second;
-	anim.pTexture     = pTexture;
-	anim.pSpriteSizes = &m_spriteSizes;
-	anim.startFrame   = m_vertexBuffer.size() >> 2;
-	anim.duration     = columns * rows;
-	anim.fps          = fps;
-	anim.delay        = delay;
+	auto& anim       = it.first->second;
+	anim.pTexture    = pTexture;
+	anim.pFrameSizes = &m_frameSizes;
+	anim.startFrame  = m_vertexBuffer.size() >> 2;
+	anim.duration    = columns * rows;
+	anim.fps         = fps;
+	anim.delay       = delay;
 
-	int  frameWidth  = pTexture->width / columns;
-	int  frameHeight = pTexture->height / rows;
-	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
+	int  frameWidth  = pTexture->size.x / columns;
+	int  frameHeight = pTexture->size.y / rows;
+	auto ratio = 1.0f / glm::vec2(pTexture->size);
 
 	for (int y = 0; y < rows; ++y)
 		for (int x = 0; x < columns; ++x)	
@@ -114,7 +114,7 @@ bool SpriteManager::createGridAnimaton(const std::string &name, const Texture2D 
     return true;
 }
 
-bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D *pTexture) noexcept
+bool AnimationManager::loadSpriteSheet(const std::string &filename, const Texture2D *pTexture) noexcept
 {
 	if (!pTexture)
 		return false;
@@ -141,7 +141,7 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
 
 	auto pSpriteSheet = &ssIt.first->second;
 
-	auto ratio = 1.0f / glm::vec2(pTexture->width, pTexture->height);
+	auto ratio = 1.0f / glm::vec2(pTexture->size);
 
 	for(auto pAnimNode = pSpritesNode->first_node("animation");
 		     pAnimNode != nullptr;
@@ -162,11 +162,11 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
 		auto pAnim  = &it.first->second;
 		auto pDelay = pAnimNode->first_attribute("delay");
 
-		pAnim->pTexture     = pTexture;
-		pAnim->pSpriteSizes = &m_spriteSizes;
-		pAnim->startFrame   = m_vertexBuffer.size() >> 2;
-		pAnim->delay        = pDelay ? std::atoi(pDelay->value()) * 0.001f : 1.0f; // Convert milliseconds to seconds
-		pAnim->fps          = 1.0f / pAnim->delay; // The number of frames shown per second
+		pAnim->pTexture    = pTexture;
+		pAnim->pFrameSizes = &m_frameSizes;
+		pAnim->startFrame  = m_vertexBuffer.size() >> 2;
+		pAnim->delay       = pDelay ? std::atoi(pDelay->value()) * 0.001f : 1.0f; // Convert milliseconds to seconds
+		pAnim->fps         = 1.0f / pAnim->delay; // The number of frames shown per second
 
 		auto pCutNode = pAnimNode->first_node("cut");
 
@@ -194,21 +194,21 @@ bool SpriteManager::loadSpriteSheet(const std::string &filename, const Texture2D
     return true;
 }
 
-const SpriteManager::Animation2D* SpriteManager::getAnimation(const std::string &name) const noexcept
+const AnimationManager::Animation2D* AnimationManager::getAnimation(const std::string &name) const noexcept
 {
     auto found = m_animations.find(name);
 
     return (found != m_animations.end()) ? &found->second : nullptr;
 }
 
-const SpriteManager::SpriteSheet* SpriteManager::getSpriteSheet(const std::string &name) const noexcept
+const AnimationManager::SpriteSheet* AnimationManager::getSpriteSheet(const std::string &name) const noexcept
 {
     auto found = m_spriteSheets.find(name);
 
     return (found != m_spriteSheets.end()) ? &found->second : nullptr;
 }
 
-void SpriteManager::unloadOnGPU() noexcept
+void AnimationManager::unloadOnGPU() noexcept
 {
 	if(m_vertexBuffer.empty())
 		return;
@@ -235,39 +235,39 @@ void SpriteManager::unloadOnGPU() noexcept
 	m_vertexBuffer.clear();
 }
 
-void SpriteManager::bind() noexcept
+void AnimationManager::bind() noexcept
 {
 	if(m_vao)
 		glBindVertexArray(m_vao);
 }
 
-void SpriteManager::unbind() noexcept
+void AnimationManager::unbind() noexcept
 {
 	glBindVertexArray(0);
 }
 
-void SpriteManager::release() noexcept
+void AnimationManager::release() noexcept
 {
 	if(m_vao)
 	{
 		glDeleteVertexArrays(1, &m_vao);
-		m_vao = 0;
+		m_vao = 0u;
 	}
 
 	if(m_vbo)
 	{
 		glDeleteBuffers(1, &m_vbo);
-		m_vbo = 0;
+		m_vbo = 0u;
 	}
 }
 
-void SpriteManager::createVerticesFromFrame(const glm::ivec4 &frame, const glm::vec2 &ratio) noexcept
+void AnimationManager::createVerticesFromFrame(const glm::ivec4 &frame, const glm::vec2 &ratio) noexcept
 {
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
-	m_spriteSizes.emplace_back(frame.z, frame.w);
+	m_frameSizes.emplace_back(frame.z, frame.w);
 
 	Vertex2D* quad = &m_vertexBuffer[m_vertexBuffer.size() - 4];
 
