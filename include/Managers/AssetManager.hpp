@@ -8,7 +8,7 @@
 #include <glad/glad.h>
 
 #include "Utils/Files.hpp"
-#include "Graphics/Texture2D.hpp"
+#include "Graphics/2D/Texture2D.hpp"
 #include "Graphics/Shader.hpp"
 #include "Managers/Base/Manager.hpp"
 

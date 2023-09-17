@@ -1,5 +1,5 @@
-#ifndef SPRITE_HPP
-#define SPRITE_HPP
+#ifndef SPRITE2D_HPP
+#define SPRITE2D_HPP
 
 /// A sprite is a lightweight class representing a minimal graphical element for rendering a rectangular shape with a texture in a game. 
 /// It contains only identifiers of the texture and the rectangle from it. 
@@ -24,16 +24,16 @@
 ///
 /// \see AssetManager, Texture2D, Transform2D, Animation2DManager, Animation2D, Animator2D
 
-#include "Transform2D.hpp"
+#include "Graphics/2D/Transform2D.hpp"
 
-class Sprite:
+class Sprite2D:
 	public Transform2D
 {
 public:
-	Sprite() noexcept;
-	Sprite(glm::uint32_t texture) noexcept;
-	Sprite(glm::uint32_t texture, glm::uint32_t frameNum) noexcept;
-	~Sprite() = default;
+	Sprite2D() noexcept;
+	Sprite2D(glm::uint32_t texture) noexcept;
+	Sprite2D(glm::uint32_t texture, glm::uint32_t frameNum) noexcept;
+	~Sprite2D() = default;
 
 	void setTexture(glm::uint32_t texture) noexcept;
 	void setFrame(glm::uint32_t frameNum)  noexcept;

@@ -1,8 +1,8 @@
-#include "Graphics/Transform2D.hpp"
-
 #include <cmath>
 
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Graphics/2D/Transform2D.hpp"
 
 Transform2D::Transform2D() noexcept :
     m_matrix(glm::identity<glm::mat4>()),

@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 
-#include "Graphics/Texture2D.hpp"
-#include "Graphics/TileMap.hpp"
+#include "Graphics/2D/Texture2D.hpp"
+#include "Graphics/2D/TileMap.hpp"
 
 TileMap::TileMap() noexcept
 {

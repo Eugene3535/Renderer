@@ -1,7 +1,7 @@
-#include "Graphics/Texture2D.hpp"
-#include "Graphics/Animator.hpp"
+#include "Graphics/2D/Texture2D.hpp"
+#include "Graphics/2D/Animator2D.hpp"
 
-Animator::Animator() noexcept :
+Animator2D::Animator2D() noexcept :
     m_pSprite(nullptr),
     m_pCurrentAnimation(nullptr),
     m_currentFrame(0),
@@ -9,16 +9,16 @@ Animator::Animator() noexcept :
 {
 }
 
-Animator::~Animator()
+Animator2D::~Animator2D()
 {
 }
 
-void Animator::setSprite(Sprite* pSprite) noexcept
+void Animator2D::setSprite(Sprite2D* pSprite) noexcept
 {
     m_pSprite = pSprite;
 }
 
-void Animator::setAnimation(const Animation2DManager::Animation2D* pAnim) noexcept
+void Animator2D::setAnimation(const Animation2DManager::Animation2D* pAnim) noexcept
 {
 #ifdef DEBUG
     if( ! (m_pSprite && pAnim) ) return;
@@ -38,22 +38,22 @@ void Animator::setAnimation(const Animation2DManager::Animation2D* pAnim) noexce
     }
 }
 
-const Sprite* Animator::getSprite() const noexcept
+const Sprite2D* Animator2D::getSprite() const noexcept
 {
 	return m_pSprite;
 }
 
-const Animation2DManager::Animation2D* Animator::getAnimation() const noexcept
+const Animation2DManager::Animation2D* Animator2D::getAnimation() const noexcept
 {
 	return m_pCurrentAnimation;
 }
 
-const Animator::Status* Animator::getStatus() const noexcept
+const Animator2D::Status* Animator2D::getStatus() const noexcept
 {
     return &m_status;
 }
 
-void Animator::update(float dt) noexcept
+void Animator2D::update(float dt) noexcept
 {
 #ifdef DEBUG
     if( !( m_pSprite && m_pCurrentAnimation )) return;
@@ -84,30 +84,30 @@ void Animator::update(float dt) noexcept
     }
 }
 
-void Animator::stop() noexcept
+void Animator2D::stop() noexcept
 {
     m_status.isPlaying = false;
 }
 
-void Animator::play() noexcept
+void Animator2D::play() noexcept
 {
     if( ! m_status.isOver )
         m_status.isPlaying = true;
 }
 
-void Animator::loop(bool b) noexcept
+void Animator2D::loop(bool b) noexcept
 {
     m_status.isLooped = b;
 }
 
-void Animator::restart() noexcept
+void Animator2D::restart() noexcept
 {
     m_currentFrame  = m_status.isReversed ? (m_pCurrentAnimation->duration - 1) : 0;
     m_timer         = 0.0f;
     m_status.isOver = false;
 }
 
-void Animator::reverse(bool r) noexcept
+void Animator2D::reverse(bool r) noexcept
 {
     m_status.isReversed = r;
 }

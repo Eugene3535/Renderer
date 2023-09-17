@@ -7,7 +7,7 @@
 
 #include <glm/glm.hpp>
 
-#include "Graphics/Vertex2D.hpp"
+#include "Graphics/2D/Vertex2D.hpp"
 #include "Managers/Base/Manager.hpp"
 
 class Animation2DManager:

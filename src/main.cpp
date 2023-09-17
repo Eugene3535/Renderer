@@ -10,9 +10,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Graphics/Shader.hpp"
-#include "Graphics/Transform2D.hpp"
-#include "Graphics/Sprite.hpp"
-#include "Graphics/Animator.hpp"
+#include "Graphics/2D/Transform2D.hpp"
+#include "Graphics/2D/Sprite2D.hpp"
+#include "Graphics/2D/Animator2D.hpp"
 
 #include "Managers/AssetManager.hpp"
 #include "Managers/Animation2DManager.hpp"
@@ -70,14 +70,14 @@ int main()
     AssetManager al;
     Animation2DManager sm;
     TileMapManager tm;
-    Animator anim;
+    Animator2D anim;
 
     sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 30);
     sm.unloadOnGPU();
 
     auto tmp = tm.loadFromFile("TestMap.tmx");
 
-    Sprite sprite;
+    Sprite2D sprite;
     sprite.setTexture(AssetManager::get<Texture2D>("Explosion.png")->texture);
     sprite.setFrame(0);
 
