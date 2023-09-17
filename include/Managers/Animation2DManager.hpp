@@ -1,5 +1,5 @@
-#ifndef ANIMATION_MANAGER_HPP
-#define ANIMATION_MANAGER_HPP
+#ifndef ANIMATION2D_MANAGER_HPP
+#define ANIMATION2D_MANAGER_HPP
 
 #include <string>
 #include <vector>
@@ -10,7 +10,7 @@
 #include "Graphics/Vertex2D.hpp"
 #include "Managers/Base/Manager.hpp"
 
-class AnimationManager:
+class Animation2DManager:
 	public Manager
 {
 public:
@@ -19,18 +19,18 @@ public:
 		const struct Texture2D*        pTexture    = nullptr;
 		const std::vector<glm::ivec2>* pFrameSizes = nullptr;
 
-		unsigned startFrame = 0u;   // Start frame number
-		unsigned duration   = 0u;   // Number of frames
-		unsigned fps        = 0u;   // Animation rate (frames per second)
-		float    delay      = 1.0f; // Delay between frames (a second by default)
+		int   startFrame = 0;   // Start frame number
+		int   duration   = 0;   // Number of frames
+		int   fps        = 0;   // Animation rate (frames per second)
+		float delay      = 1.0f; // Delay between frames (a second by default)
 	};
 
 public:
 	using SpriteSheet = std::unordered_map<std::string, Animation2D*>;
 
 public:
-	AnimationManager() noexcept;
-	~AnimationManager();
+	Animation2DManager() noexcept;
+	~Animation2DManager();
 
 	bool createFrame(const std::string& name, const struct Texture2D* pTexture, const glm::ivec4& frame) noexcept;
 	bool createLinearAnimaton(const std::string& name, const struct Texture2D* pTexture, int duration, int fps, float delay = 1.0f) noexcept;

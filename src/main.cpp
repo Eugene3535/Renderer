@@ -12,9 +12,10 @@
 #include "Graphics/Shader.hpp"
 #include "Graphics/Transform2D.hpp"
 #include "Graphics/Sprite.hpp"
+#include "Graphics/Animator.hpp"
 
 #include "Managers/AssetManager.hpp"
-#include "Managers/AnimationManager.hpp"
+#include "Managers/Animation2DManager.hpp"
 #include "Managers/TileMapManager.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -67,8 +68,9 @@ int main()
 #endif
 
     AssetManager al;
-    AnimationManager sm;
+    Animation2DManager sm;
     TileMapManager tm;
+    Animator anim;
 
     sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 30);
     sm.unloadOnGPU();
@@ -78,6 +80,12 @@ int main()
     Sprite sprite;
     sprite.setTexture(AssetManager::get<Texture2D>("Explosion.png")->texture);
     sprite.setFrame(0);
+
+    anim.setSprite(&sprite);
+    anim.setAnimation(sm.getAnimation("Explosion"));
+    anim.loop(true);
+    anim.reverse(true);
+    anim.play();
 
     Shader* tilemapShader = AssetManager::get<Shader>("TileMap", "TileMap.vert", "TileMap.frag");
     Shader::bind(tilemapShader);
@@ -98,10 +106,18 @@ int main()
     int frameNum = 0;
     int angle = 0;
 
-    sprite.setPosition(550, 10);
+    sprite.setOrigin(128, 128);
+    sprite.setPosition(200, 50);
+    //sprite.setScale(-1, 1);
+
+    float lastTime = static_cast<float>(glfwGetTime());
 
     while (!glfwWindowShouldClose(window))
     {
+        float currentTime = static_cast<float>(glfwGetTime());
+        float dt = currentTime - lastTime;
+        lastTime = currentTime; 
+
         glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -125,24 +141,17 @@ int main()
         for(const auto& layer : tmp->getTileLayers())
             tmp->draw(layer);
 
-        //if(++counter > 2)
-        {
-            counter  = 0;
-            frameNum++;
+        Shader::bind(nullptr);
 
-            if(frameNum > 47)
-                frameNum = 0;
-
-            sprite.setFrame(frameNum);
-        }
-
-        //model.setRotation(angle++);
-        //model.move(1, 0);
+        anim.update(dt);
 
         sm.bind();
         Shader::bind(spriteShader);
+
         glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(viewProjMat * sprite.getMatrix()));
         sprite.draw();
+
+        Shader::bind(nullptr);
         sm.unbind();
 
         glfwSwapBuffers(window);

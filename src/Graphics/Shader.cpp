@@ -58,6 +58,8 @@ void Shader::bind(const Shader* shader) noexcept
 {
     if(shader)
         glUseProgram(shader->m_program);
+    else
+        glUseProgram(0);
 }
 
 std::string Shader::readShaderSourceFromFile(const std::string& filepath)

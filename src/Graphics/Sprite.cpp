@@ -8,6 +8,18 @@ Sprite::Sprite() noexcept:
 {
 }
 
+Sprite::Sprite(glm::uint32_t texture) noexcept:
+	m_texture(texture),
+	m_frame(0u)
+{
+}
+
+Sprite::Sprite(glm::uint32_t texture, glm::uint32_t frameNum) noexcept:
+	m_texture(texture),
+	m_frame(frameNum)
+{
+}
+
 void Sprite::setTexture(glm::uint32_t texture) noexcept
 {
 	m_texture = texture;

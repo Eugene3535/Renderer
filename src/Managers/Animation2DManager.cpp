@@ -7,20 +7,20 @@
 
 #include "Utils/Files.hpp"
 #include "Graphics/Texture2D.hpp"
-#include "Managers/AnimationManager.hpp"
+#include "Managers/Animation2DManager.hpp"
 
-AnimationManager::AnimationManager() noexcept:
+Animation2DManager::Animation2DManager() noexcept:
 	m_vao(0u), 
 	m_vbo(0u)
 {
 }
 
-AnimationManager::~AnimationManager()
+Animation2DManager::~Animation2DManager()
 {
 	release();
 }
 
-bool AnimationManager::createFrame(const std::string& name, const Texture2D *pTexture, const glm::ivec4 &frame) noexcept
+bool Animation2DManager::createFrame(const std::string& name, const Texture2D *pTexture, const glm::ivec4 &frame) noexcept
 {
 	if (!pTexture)
 		return false;
@@ -48,7 +48,7 @@ bool AnimationManager::createFrame(const std::string& name, const Texture2D *pTe
 	return true;
 }
 
-bool AnimationManager::createLinearAnimaton(const std::string &name, const Texture2D *pTexture, int duration, int fps, float delay) noexcept
+bool Animation2DManager::createLinearAnimaton(const std::string &name, const Texture2D *pTexture, int duration, int fps, float delay) noexcept
 {
 	if (!pTexture)
 		return false;
@@ -80,7 +80,7 @@ bool AnimationManager::createLinearAnimaton(const std::string &name, const Textu
     return true;
 }
 
-bool AnimationManager::createGridAnimaton(const std::string &name, const Texture2D *pTexture, int columns, int rows, int fps, float delay) noexcept
+bool Animation2DManager::createGridAnimaton(const std::string &name, const Texture2D *pTexture, int columns, int rows, int fps, float delay) noexcept
 {
 	if(!pTexture)
 		return false;
@@ -114,7 +114,7 @@ bool AnimationManager::createGridAnimaton(const std::string &name, const Texture
     return true;
 }
 
-bool AnimationManager::loadSpriteSheet(const std::string &filename, const Texture2D *pTexture) noexcept
+bool Animation2DManager::loadSpriteSheet(const std::string &filename, const Texture2D *pTexture) noexcept
 {
 	if (!pTexture)
 		return false;
@@ -194,21 +194,21 @@ bool AnimationManager::loadSpriteSheet(const std::string &filename, const Textur
     return true;
 }
 
-const AnimationManager::Animation2D* AnimationManager::getAnimation(const std::string &name) const noexcept
+const Animation2DManager::Animation2D* Animation2DManager::getAnimation(const std::string &name) const noexcept
 {
     auto found = m_animations.find(name);
 
     return (found != m_animations.end()) ? &found->second : nullptr;
 }
 
-const AnimationManager::SpriteSheet* AnimationManager::getSpriteSheet(const std::string &name) const noexcept
+const Animation2DManager::SpriteSheet* Animation2DManager::getSpriteSheet(const std::string &name) const noexcept
 {
     auto found = m_spriteSheets.find(name);
 
     return (found != m_spriteSheets.end()) ? &found->second : nullptr;
 }
 
-void AnimationManager::unloadOnGPU() noexcept
+void Animation2DManager::unloadOnGPU() noexcept
 {
 	if(m_vertexBuffer.empty())
 		return;
@@ -235,18 +235,18 @@ void AnimationManager::unloadOnGPU() noexcept
 	m_vertexBuffer.clear();
 }
 
-void AnimationManager::bind() noexcept
+void Animation2DManager::bind() noexcept
 {
 	if(m_vao)
 		glBindVertexArray(m_vao);
 }
 
-void AnimationManager::unbind() noexcept
+void Animation2DManager::unbind() noexcept
 {
 	glBindVertexArray(0);
 }
 
-void AnimationManager::release() noexcept
+void Animation2DManager::release() noexcept
 {
 	if(m_vao)
 	{
@@ -261,7 +261,7 @@ void AnimationManager::release() noexcept
 	}
 }
 
-void AnimationManager::createVerticesFromFrame(const glm::ivec4 &frame, const glm::vec2 &ratio) noexcept
+void Animation2DManager::createVerticesFromFrame(const glm::ivec4 &frame, const glm::vec2 &ratio) noexcept
 {
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
