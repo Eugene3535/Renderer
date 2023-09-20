@@ -7,7 +7,7 @@ Dependencies should be placed in the External folder, in environment variables w
 For windows - D:/External as External;
 For linux - $HOME/External as External;
 
-**5. Open git-bash and type:**  
+**Open git-bash and type:**  
 ```console
 git clone https://github.com/Eugene3535/Renderer.git 
 mkdir build && cmake -S Renderer -B build
