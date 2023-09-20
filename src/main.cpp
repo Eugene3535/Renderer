@@ -87,7 +87,7 @@ int main()
     anim.reverse(true);
     anim.play();
 
-    Shader* tilemapShader = AssetManager::get<Shader>("TileMap", "TileMap.vert", "TileMap.frag");
+    Shader* tilemapShader = AssetManager::get<Shader>("TileMap", "tilemap.vert", "tilemap.frag");
     Shader::bind(tilemapShader);
     
     int ViewProjection = tilemapShader->getUniformLocation("ViewProjection");
@@ -97,7 +97,7 @@ int main()
 
     glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view));
 
-    Shader* spriteShader = AssetManager::get<Shader>("SpriteShader", "Sprite.vert", "Sprite.frag");
+    Shader* spriteShader = AssetManager::get<Shader>("SpriteShader", "sprite.vert", "sprite.frag");
     Shader::bind(spriteShader);
 
     int ModelViewProjectionLoc = spriteShader->getUniformLocation("ModelViewProjection");

@@ -6,7 +6,7 @@
 #include "rapidxml_utils.hpp"
 
 #include "Utils/Files.hpp"
-#include "Graphics/Texture2D.hpp"
+#include "Graphics/2D/Texture2D.hpp"
 #include "Managers/Animation2DManager.hpp"
 
 Animation2DManager::Animation2DManager() noexcept:
