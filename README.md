@@ -12,5 +12,4 @@ For linux - $HOME/External as External;
 git clone https://github.com/Eugene3535/Renderer.git 
 mkdir build && cmake -S Renderer -B build
 cmake --build build --config Release
-./Renderer
 ```
