@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 
-#include "Graphics/2D/Sprite2D.hpp"
+#include "graphics/2D/Sprite2D.hpp"
 
 Sprite2D::Sprite2D() noexcept:
 	m_texture(0u),

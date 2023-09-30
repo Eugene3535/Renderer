@@ -9,10 +9,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Utils/Files.hpp"
-#include "Utils/Defines.hpp"
-#include "Managers/AssetManager.hpp"
-#include "Managers/TileMapManager.hpp"
+#include "utils/Files.hpp"
+#include "utils/Defines.hpp"
+#include "managers/AssetManager.hpp"
+#include "managers/TileMapManager.hpp"
 
 TileMapManager::TileMapManager() noexcept
 {

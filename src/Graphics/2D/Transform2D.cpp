@@ -2,7 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Graphics/2D/Transform2D.hpp"
+#include "graphics/2D/Transform2D.hpp"
 
 Transform2D::Transform2D() noexcept :
     m_matrix(glm::identity<glm::mat4>()),
@@ -123,13 +123,11 @@ Transform2D* Transform2D::scale(const glm::vec2& factor) noexcept
 }
 
 const glm::mat4& Transform2D::getMatrix() const noexcept
-{
-    static constexpr float factor = 3.141592654f / 180.f;
-    
+{  
     // Recompute the matrix if needed
     if (m_transformNeedUpdate)
     {
-        float angle  = -m_rotation * factor;
+        float angle  = glm::radians(-m_rotation);
         float cosine = cos(angle);
         float sine   = sin(angle);
         float sxc    = m_scale.x * cosine;

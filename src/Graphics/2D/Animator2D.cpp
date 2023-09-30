@@ -1,5 +1,5 @@
-#include "Graphics/2D/Texture2D.hpp"
-#include "Graphics/2D/Animator2D.hpp"
+#include "graphics/2D/Texture2D.hpp"
+#include "graphics/2D/Animator2D.hpp"
 
 Animator2D::Animator2D() noexcept :
     m_pSprite(nullptr),

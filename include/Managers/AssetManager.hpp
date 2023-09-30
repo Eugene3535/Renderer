@@ -7,10 +7,10 @@
 
 #include <glad/glad.h>
 
-#include "Utils/Files.hpp"
-#include "Graphics/2D/Texture2D.hpp"
-#include "Graphics/Shader.hpp"
-#include "Managers/Base/Manager.hpp"
+#include "utils/Files.hpp"
+#include "graphics/2D/Texture2D.hpp"
+#include "graphics/Shader.hpp"
+#include "managers/Base/Manager.hpp"
 
 class AssetManager:
     public Manager

@@ -1,6 +1,4 @@
 #include <iostream>
-#include <chrono>
-#include <thread>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -9,14 +7,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Graphics/Shader.hpp"
-#include "Graphics/2D/Transform2D.hpp"
-#include "Graphics/2D/Sprite2D.hpp"
-#include "Graphics/2D/Animator2D.hpp"
+#include "graphics/Shader.hpp"
+#include "graphics/2D/Transform2D.hpp"
+#include "graphics/2D/Sprite2D.hpp"
+#include "graphics/2D/Animator2D.hpp"
 
-#include "Managers/AssetManager.hpp"
-#include "Managers/Animation2DManager.hpp"
-#include "Managers/TileMapManager.hpp"
+#include "managers/AssetManager.hpp"
+#include "managers/Animation2DManager.hpp"
+#include "managers/TileMapManager.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 bool IsKeyPressed(GLFWwindow* window, const int key);
@@ -30,7 +28,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(screen_size.x, screen_size.y, "Platformer2D", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(screen_size.x, screen_size.y, "Renderer", nullptr, nullptr);
 
     if (window == nullptr)
     {
@@ -84,7 +82,7 @@ int main()
     anim.setSprite(&sprite);
     anim.setAnimation(sm.getAnimation("Explosion"));
     anim.loop(true);
-    anim.reverse(true);
+    anim.reverse(false);
     anim.play();
 
     Shader* tilemapShader = AssetManager::get<Shader>("TileMap", "tilemap.vert", "tilemap.frag");
@@ -93,9 +91,9 @@ int main()
     int ViewProjection = tilemapShader->getUniformLocation("ViewProjection");
 
     glm::mat4 projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, -1.0f, 1.0f);
-    glm::mat4 view(glm::identity<glm::mat4>());
+    Transform2D view;
 
-    glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view));
+    glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view.getMatrix()));
 
     Shader* spriteShader = AssetManager::get<Shader>("SpriteShader", "sprite.vert", "sprite.frag");
     Shader::bind(spriteShader);
@@ -110,10 +108,15 @@ int main()
     sprite.setPosition(200, 50);
     //sprite.setScale(-1, 1);
 
+    int posX = 0;
+    int posY = 0;
+
     float lastTime = static_cast<float>(glfwGetTime());
 
     while (!glfwWindowShouldClose(window))
     {
+        glfwPollEvents();  
+
         float currentTime = static_cast<float>(glfwGetTime());
         float dt = currentTime - lastTime;
         lastTime = currentTime; 
@@ -122,18 +125,18 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         if(IsKeyPressed(window, GLFW_KEY_A))
-            view = glm::translate(view,glm::vec3(6, 0, 0) );
+            view.move(10, 0);
 
         if(IsKeyPressed(window, GLFW_KEY_D))
-            view = glm::translate(view,glm::vec3(-6, 0, 0) );
+            view.move(-10, 0);
 
         if(IsKeyPressed(window, GLFW_KEY_W))
-            view = glm::translate(view,glm::vec3(0, 6, 0) );
+            view.move(0 , 10);
 
         if(IsKeyPressed(window, GLFW_KEY_S))
-            view = glm::translate(view,glm::vec3(0, -6, 0) );
+            view.move(0, -10);
 
-        const glm::mat4 viewProjMat { projection * view }; 
+        glm::mat4 viewProjMat { projection * view.getMatrix() }; 
 
         Shader::bind(tilemapShader);
         glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(viewProjMat));
@@ -148,14 +151,14 @@ int main()
         sm.bind();
         Shader::bind(spriteShader);
 
+
         glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(viewProjMat * sprite.getMatrix()));
         sprite.draw();
 
         Shader::bind(nullptr);
         sm.unbind();
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();      
+        glfwSwapBuffers(window);    
     }
 
     glfwTerminate();

@@ -5,7 +5,7 @@
 
 #include <glad/glad.h>
 
-#include "Graphics/2D/Texture2D.hpp"
+#include "graphics/2D/Texture2D.hpp"
 
 bool LoadImageFromFile(const std::string& filepath, std::vector<glm::uint8_t>& pixels, glm::ivec2& size)
 {

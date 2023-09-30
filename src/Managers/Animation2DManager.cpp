@@ -5,9 +5,9 @@
 #include "rapidxml_ext.h"
 #include "rapidxml_utils.hpp"
 
-#include "Utils/Files.hpp"
-#include "Graphics/2D/Texture2D.hpp"
-#include "Managers/Animation2DManager.hpp"
+#include "utils/Files.hpp"
+#include "graphics/2D/Texture2D.hpp"
+#include "managers/Animation2DManager.hpp"
 
 Animation2DManager::Animation2DManager() noexcept:
 	m_vao(0u), 

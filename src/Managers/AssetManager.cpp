@@ -1,4 +1,4 @@
-#include "Managers/AssetManager.hpp"
+#include "managers/AssetManager.hpp"
 
 AssetManager* AssetManager::m_pInstance;
 

@@ -9,9 +9,9 @@
 
 #include "rapidxml.hpp"
 
-#include "Managers/Base/Manager.hpp"
-#include "Graphics/2D/Vertex2D.hpp"
-#include "Graphics/2D/TileMap.hpp"
+#include "managers/base/Manager.hpp"
+#include "graphics/2D/Vertex2D.hpp"
+#include "graphics/2D/TileMap.hpp"
 
 class TileMapManager:
 	public Manager
