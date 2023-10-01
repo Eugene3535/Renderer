@@ -7,5 +7,4 @@
 #define RADTODEG 57.29577f
 #define EPSILON 0.000001f
 
-
 #endif
