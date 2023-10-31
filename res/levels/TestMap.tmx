@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="55" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="98">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="55" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="98">
  <tileset firstgid="1" name="tileset1" tilewidth="32" tileheight="32" tilecount="300" columns="20">
   <image source="../textures/tileset1.png" width="640" height="480"/>
  </tileset>
  <tileset firstgid="301" name="tileset2" tilewidth="32" tileheight="32" tilecount="144" columns="12">
   <image source="../textures/tileset2.png" width="384" height="384"/>
  </tileset>
- <layer id="1" name="Background 1" width="55" height="20" visible="0">
+ <layer id="1" name="Background 1" width="55" height="20">
   <data encoding="csv">
 2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,126,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,
 3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,146,207,207,207,207,0,0,0,0,0,0,0,0,0,0,3,

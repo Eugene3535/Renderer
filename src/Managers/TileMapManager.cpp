@@ -306,7 +306,7 @@ void TileMapManager::unloadOnGPU(const std::vector<Vertex2D>& vertices, const st
 	glBindVertexArray(layer.vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, layer.vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * vertices.size() * 4, vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex2D) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), nullptr);
 	glEnableVertexAttribArray(0);
@@ -315,7 +315,7 @@ void TileMapManager::unloadOnGPU(const std::vector<Vertex2D>& vertices, const st
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, layer.ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uint32_t) * indices.size() * 6, indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uint32_t) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
