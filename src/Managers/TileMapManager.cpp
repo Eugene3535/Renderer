@@ -45,7 +45,7 @@ const TileMap* TileMapManager::loadFromFile(const std::string& filename) noexcep
 	auto& pTileMap = m_tileMaps.emplace_back(std::make_unique<TileMap>());
 	pTileMap->m_name = filename;
 
-	if ( ! (loadTilePlanes(pMapNode) && loadObjects(pMapNode)) )
+	if ( ! (loadTileLayers(pMapNode) && loadObjects(pMapNode)) )
 	{
 		m_tileMaps.pop_back();
 
@@ -69,7 +69,7 @@ void TileMapManager::clear() noexcept
 	m_tileMaps.clear();
 }
 
-bool TileMapManager::loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept
+bool TileMapManager::loadTileLayers(const rapidxml::xml_node<char>* pMapNode) noexcept
 {
 	std::vector<TilesetData> tilesets = parseTilesets(pMapNode);
 
@@ -317,5 +317,5 @@ void TileMapManager::unloadOnGPU(const std::vector<Vertex2D>& vertices, const st
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, layer.ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uint32_t) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }

@@ -35,7 +35,7 @@ public:
 	void clear() noexcept;
 	
 private:
-	bool loadTilePlanes(const rapidxml::xml_node<char>* pMapNode) noexcept;
+	bool loadTileLayers(const rapidxml::xml_node<char>* pMapNode) noexcept;
 	bool loadObjects(const rapidxml::xml_node<char>* pMapNode)    noexcept;
 
 private:

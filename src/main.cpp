@@ -65,6 +65,10 @@ int main()
         }, 0 );
 #endif
 
+    std::cout << glGetString(GL_VERSION) << '\n';
+
+
+
     AssetManager al;
     Animation2DManager sm;
     TileMapManager tm;
@@ -82,7 +86,7 @@ int main()
     anim.setSprite(&sprite);
     anim.setAnimation(sm.getAnimation("Explosion"));
     anim.loop(true);
-    anim.reverse(false);
+    anim.reverse(true);
     anim.play();
 
     Shader* tilemapShader = AssetManager::get<Shader>("TileMap", "tilemap.vert", "tilemap.frag");
