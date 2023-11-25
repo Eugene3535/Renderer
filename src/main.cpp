@@ -130,8 +130,6 @@ int main()
         float deltaTime = currentTime - lastTime;
         lastTime = currentTime; 
 
-        std::cout << (int)currentTime << '\n';
-
         dt = static_cast<int>(deltaTime * 1000);
 
         glClearColor(0.6f, 0.8f, 1.0f, 1.0f);

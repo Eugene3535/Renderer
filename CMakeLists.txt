@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(Platformer2D LANGUAGES C CXX)
+project(Renderer LANGUAGES C CXX)
 
 set(EXTERNAL_DIR "$ENV{External}")
 
@@ -30,7 +30,7 @@ target_link_libraries(${PROJECT_NAME} glfw glad glm)
 target_include_directories(${PROJECT_NAME} PRIVATE
 	"${EXTERNAL_DIR}/rapidxml"
 	"${EXTERNAL_DIR}/stb"
-	"${CMAKE_SOURCE_DIR}/include"
+	"${CMAKE_SOURCE_DIR}/src"
 )
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
@@ -38,6 +38,5 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${PROJECT_NAME})
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-					COMMAND ${CMAKE_COMMAND} -E copy_directory
-					${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res)
+	COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res $<TARGET_FILE_DIR:${PROJECT_NAME}>/res)
 	
