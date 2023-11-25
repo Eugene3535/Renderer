@@ -1,10 +1,10 @@
-#include "utils/Files.hpp"
+#include "system/FileProvider.hpp"
 
 #include <fstream>
 #include <filesystem>
 #include <algorithm>
 
-std::string FileUtils::getPathToFile(const std::string& filename)
+std::string FileProvider::getPathToFile(const std::string& filename) noexcept
 {   
     static std::string resource_folder;
 

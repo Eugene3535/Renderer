@@ -1,9 +1,9 @@
 #include "managers/AssetManager.hpp"
 
-AssetManager* AssetManager::m_pInstance;
+AssetManager* AssetManager::m_instance;
 
 AssetManager::AssetManager() noexcept
 {
-    if(!m_pInstance)
-        m_pInstance = this;
+    if(!m_instance)
+        m_instance = this;
 }

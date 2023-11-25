@@ -8,13 +8,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "graphics/Shader.hpp"
-#include "graphics/2D/Transform2D.hpp"
-#include "graphics/2D/Sprite2D.hpp"
-#include "graphics/2D/Animator2D.hpp"
+#include "graphics/Transform2D.hpp"
+#include "graphics/Sprite2D.hpp"
+#include "graphics/TiledMap.hpp"
+#include "controllers/Animator.hpp"
 
 #include "managers/AssetManager.hpp"
-#include "managers/Animation2DManager.hpp"
-#include "managers/TileMapManager.hpp"
+#include "managers/SpriteManager.hpp"
+#include "managers/TiledMapManager.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 bool IsKeyPressed(GLFWwindow* window, const int key);
@@ -67,24 +68,23 @@ int main()
 
     std::cout << glGetString(GL_VERSION) << '\n';
 
-
-
     AssetManager al;
-    Animation2DManager sm;
-    TileMapManager tm;
-    Animator2D anim;
+    SpriteManager sm;
+    TiledMapManager tm;
+    Animator anim;
 
-    sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 30);
+    AssetManager::get<Texture2D>("Explosion.png");
+
+    sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 1000 / 30);
     sm.unloadOnGPU();
 
     auto tmp = tm.loadFromFile("TestMap.tmx");
 
-    Sprite2D sprite;
-    sprite.setTexture(AssetManager::get<Texture2D>("Explosion.png")->texture);
-    sprite.setFrame(0);
+    if(!tmp)
+        return -1;
 
-    anim.setSprite(&sprite);
-    anim.setAnimation(sm.getAnimation("Explosion"));
+    if( ! anim.addAnimation("Explosion", sm.get<Animation>("Explosion"))) return -1;
+    if( ! anim.setAnimation("Explosion"))return -1;
     anim.loop(true);
     anim.reverse(true);
     anim.play();
@@ -108,22 +108,31 @@ int main()
     int frameNum = 0;
     int angle = 0;
 
-    sprite.setOrigin(128, 128);
-    sprite.setPosition(200, 50);
+    Transform2D trans;
+
+    trans.setOrigin(128, 128);
+    trans.setPosition(200, 50);
     //sprite.setScale(-1, 1);
 
     int posX = 0;
     int posY = 0;
 
+    float ugol = 0.f;
+
     float lastTime = static_cast<float>(glfwGetTime());
+    int dt = 0;
 
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();  
 
         float currentTime = static_cast<float>(glfwGetTime());
-        float dt = currentTime - lastTime;
+        float deltaTime = currentTime - lastTime;
         lastTime = currentTime; 
+
+        std::cout << (int)currentTime << '\n';
+
+        dt = static_cast<int>(deltaTime * 1000);
 
         glClearColor(0.6f, 0.8f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -145,22 +154,24 @@ int main()
         Shader::bind(tilemapShader);
         glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(viewProjMat));
 
-        for(const auto& layer : tmp->getTileLayers())
-            tmp->draw(layer);
+        for(const auto& layer : tmp->m_layers)
+            tm.draw(layer);
 
         Shader::bind(nullptr);
+
+        trans.setRotation(ugol);
+        ugol += 2.5f;
 
         anim.update(dt);
 
-        sm.bind();
+        sm.bind(true);
         Shader::bind(spriteShader);
 
-
-        glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(viewProjMat * sprite.getMatrix()));
-        sprite.draw();
+        glUniformMatrix4fv(ModelViewProjectionLoc, 1, GL_FALSE, glm::value_ptr(viewProjMat * trans.getMatrix()));
+        sm.draw(*anim.getCurrentFrame());
 
         Shader::bind(nullptr);
-        sm.unbind();
+        sm.bind(false);
 
         glfwSwapBuffers(window);    
     }

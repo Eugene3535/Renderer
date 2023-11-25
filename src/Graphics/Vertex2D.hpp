@@ -31,4 +31,4 @@ inline Vertex2D::Vertex2D(const glm::vec2& thePosition, const glm::vec2& theTexC
 {
 }
 
-#endif
+#endif // !VERTEX2D_HPP
