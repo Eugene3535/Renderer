@@ -78,7 +78,7 @@ int main()
     sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 1000 / 30);
     sm.unloadOnGPU();
 
-    auto tmp = tm.loadFromFile("TestMap.tmx");
+    auto tmp = tm.loadFromFile("Dune.tmx");
 
     if(!tmp)
         return -1;
