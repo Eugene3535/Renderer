@@ -12,11 +12,11 @@ struct TiledMap
 	{
 		std::string name;
 
-		std::uint32_t texture = 0u; // Texture handle
-		std::uint32_t count   = 0u; // Number of indices to render
-		std::uint32_t vao     = 0u; // Vertex array object
-		std::uint32_t vbo     = 0u; // Vertex buffer object
-		std::uint32_t ebo     = 0u; // Element buffer object
+		unsigned texture = 0U; // Texture handle
+		unsigned count   = 0U; // Number of indices to render
+		unsigned vao     = 0U; // Vertex array object
+		unsigned vbo     = 0U; // Vertex buffer object
+		unsigned ebo     = 0U; // Element buffer object
 	};
 
 	struct Object

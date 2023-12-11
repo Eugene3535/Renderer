@@ -90,10 +90,10 @@ bool TiledMapManager::loadTileLayers(const rapidxml::xml_node<char>* mapNode) no
 	auto tileW = mapNode->first_attribute("tilewidth");
 	auto tileH = mapNode->first_attribute("tileheight");
 
-	const std::int32_t map_width   = mapW  ? std::atoi(mapW->value())  : 0u;
-	const std::int32_t map_height  = mapH  ? std::atoi(mapH->value())  : 0;
-	const std::int32_t tile_width  = tileW ? std::atoi(tileW->value()) : 0;
-	const std::int32_t tile_height = tileH ? std::atoi(tileH->value()) : 0;
+	const int map_width   = mapW  ? std::atoi(mapW->value())  : 0;
+	const int map_height  = mapH  ? std::atoi(mapH->value())  : 0;
+	const int tile_width  = tileW ? std::atoi(tileW->value()) : 0;
+	const int tile_height = tileH ? std::atoi(tileH->value()) : 0;
 
 	auto tiledMap = m_tiledMaps.back().get();
 
@@ -115,14 +115,14 @@ bool TiledMapManager::loadTileLayers(const rapidxml::xml_node<char>* mapNode) no
 		if (!dataNode)
 			continue;
 
-		std::vector<std::int32_t> parsed_layer = parseCSVstring(dataNode);
+		std::vector<int> parsed_layer = parseCSVstring(dataNode);
 
 		std::size_t non_zero_tile_count = std::count_if(parsed_layer.begin(), parsed_layer.end(),
-			[](std::int32_t n) { return n > 0; });
+			[](int n) { return n > 0; });
 
 		const auto bounds = std::minmax_element(parsed_layer.begin(), parsed_layer.end());
-		std::int32_t minTile = *bounds.first;
-		std::int32_t maxTile = *bounds.second;
+		int minTile = *bounds.first;
+		int maxTile = *bounds.second;
 
 		auto currentTileset = std::find_if(tilesets.begin(), tilesets.end(),
 		[minTile, maxTile](const TilesetData& ts)
@@ -138,27 +138,27 @@ bool TiledMapManager::loadTileLayers(const rapidxml::xml_node<char>* mapNode) no
 		layer.texture = currentTileset->texture->getNativeHandle();
 
 		std::vector<Vertex2D> vertices;
-		std::vector<glm::uint32_t> indices;
+		std::vector<unsigned> indices;
 
 		vertices.reserve(non_zero_tile_count * 4);
 		indices.reserve(non_zero_tile_count * 6);
 
 		auto ratio = 1.0f / glm::vec2(currentTileset->texture->getSize());
 
-		for (std::int32_t y = 0u; y < map_height; ++y)
-			for (std::int32_t x = 0u; x < map_width; ++x)
+		for (int y = 0u; y < map_height; ++y)
+			for (int x = 0u; x < map_width; ++x)
 			{
-				std::int32_t tile_id = parsed_layer[y * map_width + x];
+				int tile_id = parsed_layer[y * map_width + x];
 
 				if (tile_id)
 				{
-					std::int32_t tile_num = tile_id - currentTileset->firstGID;
+					int tile_num = tile_id - currentTileset->firstGID;
 
-					std::int32_t Y = (tile_num >= currentTileset->columns) ? tile_num / currentTileset->columns : 0u;
-					std::int32_t X = tile_num % currentTileset->columns;
+					int Y = (tile_num >= currentTileset->columns) ? tile_num / currentTileset->columns : 0u;
+					int X = tile_num % currentTileset->columns;
 
-					std::int32_t offsetX = X * tile_width;
-					std::int32_t offsetY = Y * tile_height;
+					int offsetX = X * tile_width;
+					int offsetY = Y * tile_height;
 
 					float left   = offsetX * ratio.x;
 					float top    = offsetY * ratio.y;
@@ -170,7 +170,7 @@ bool TiledMapManager::loadTileLayers(const rapidxml::xml_node<char>* mapNode) no
 					glm::vec2 rightTop    = { x * tile_width + tile_width, y * tile_height };
 					glm::vec2 leftTop     = { x * tile_width,              y * tile_height };
 
-					glm::uint32_t index = static_cast<glm::uint32_t>(vertices.size());
+					unsigned index = static_cast<unsigned>(vertices.size());
 
 					vertices.emplace_back(leftBottom.x, leftBottom.y, left, bottom);
 					vertices.emplace_back(rightBootom.x, rightBootom.y, right, bottom);
@@ -271,7 +271,7 @@ std::vector<TiledMapManager::TilesetData> TiledMapManager::parseTilesets(const r
 		auto columns   = tilesetNode->first_attribute("columns");
 		auto firstGID  = tilesetNode->first_attribute("firstgid");
 
-		ts.texture  = tileset;
+		ts.texture   = tileset;
 		ts.tileCount = tileCount ? std::atoi(tileCount->value()) : 0;
 		ts.columns   = columns ? std::atoi(columns->value()) : 0;
 		ts.rows      = ( ! tileCount || ! columns ) ? 0 : ts.tileCount / ts.columns;
@@ -281,19 +281,19 @@ std::vector<TiledMapManager::TilesetData> TiledMapManager::parseTilesets(const r
 	return tilesets;
 }
 
-std::vector<std::int32_t> TiledMapManager::parseCSVstring(const rapidxml::xml_node<char>* dataNode) noexcept
+std::vector<int> TiledMapManager::parseCSVstring(const rapidxml::xml_node<char>* dataNode) noexcept
 {
 	std::string data(dataNode->value());
 
 	std::size_t amount = std::count_if(data.begin(), data.end(), [](char c){ return c == ','; }) + 1;
 	std::replace(data.begin(), data.end(), ',', ' ');
 
-	std::vector<std::int32_t> parsed_layer;
+	std::vector<int> parsed_layer;
 	parsed_layer.reserve(amount);
 
 	std::stringstream sstream(data);
 	{
-		std::int32_t tile_num = 0;
+		int tile_num = 0;
 
 		while (sstream >> tile_num)
 			parsed_layer.push_back(tile_num);
@@ -302,7 +302,7 @@ std::vector<std::int32_t> TiledMapManager::parseCSVstring(const rapidxml::xml_no
 	return parsed_layer;
 }
 
-void TiledMapManager::unloadOnGPU(const std::vector<Vertex2D>& vertices, const std::vector<glm::uint32_t>& indices) noexcept
+void TiledMapManager::unloadOnGPU(const std::vector<Vertex2D>& vertices, const std::vector<unsigned>& indices) noexcept
 {
 	if(m_tiledMaps.empty())
 		return;
@@ -326,7 +326,7 @@ void TiledMapManager::unloadOnGPU(const std::vector<Vertex2D>& vertices, const s
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, layer.ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(glm::uint32_t) * indices.size(), indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
 	glBindVertexArray(0);
 }

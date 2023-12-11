@@ -1,10 +1,13 @@
 #include <memory>
 
+#include <glad/glad.h>
+
 #include "rapidxml_ext.h"
 #include "rapidxml_utils.hpp"
 
 #include "system/FileProvider.hpp"
 #include "graphics/Texture2D.hpp"
+#include "graphics/Sprite2D.hpp"
 #include "managers/SpriteManager.hpp"
 
 SpriteManager::SpriteManager() noexcept:
@@ -38,7 +41,7 @@ bool SpriteManager::createFrame(const std::string& name, const Texture2D* textur
 	return true;
 }
 
-bool SpriteManager::createLinearAnimaton(const std::string& name, const Texture2D* texture, std::int32_t duration, std::int32_t delay) noexcept
+bool SpriteManager::createLinearAnimaton(const std::string& name, const Texture2D* texture, int duration, int delay) noexcept
 {
 	if (!texture)
 		return false;
@@ -55,11 +58,11 @@ bool SpriteManager::createLinearAnimaton(const std::string& name, const Texture2
 
 	sprites.reserve(static_cast<std::size_t>(duration));
 
-	auto size  = glm::vec2(texture->getSize());
-	auto ratio = 1.0f / size;
-	std::int32_t frameWidth = size.x / duration;
+	auto size      = glm::vec2(texture->getSize());
+	auto ratio     = 1.0f / size;
+	int frameWidth = size.x / duration;
 
-	for (std::int32_t i = 0; i < duration; ++i)
+	for (int i = 0; i < duration; ++i)
 		createSpriteFromFrame(glm::ivec4(i * frameWidth, 0, frameWidth, size.y), ratio, sprites, texture->getNativeHandle());
 
 	anim.sprites = sprites.data();
@@ -67,7 +70,7 @@ bool SpriteManager::createLinearAnimaton(const std::string& name, const Texture2
     return true;
 }
 
-bool SpriteManager::createGridAnimaton(const std::string& name, const Texture2D* texture, std::int32_t columns, std::int32_t rows, std::int32_t delay) noexcept
+bool SpriteManager::createGridAnimaton(const std::string& name, const Texture2D* texture, int columns, int rows, int delay) noexcept
 {
 	if (!texture)
 		return false;
@@ -84,10 +87,10 @@ bool SpriteManager::createGridAnimaton(const std::string& name, const Texture2D*
 
 	sprites.reserve(static_cast<std::size_t>(columns * rows));
 
-	auto size  = glm::vec2(texture->getSize());
-	auto ratio = 1.0f / size;
-	std::int32_t frameWidth  = size.x / columns;
-	std::int32_t frameHeight = size.y / rows;
+	auto size       = glm::vec2(texture->getSize());
+	auto ratio      = 1.0f / size;
+	int frameWidth  = size.x / columns;
+	int frameHeight = size.y / rows;
 
 	for (int y = 0; y < rows; ++y)
 		for (int x = 0; x < columns; ++x)	
@@ -229,19 +232,19 @@ void SpriteManager::draw(const Sprite2D& sprite) const noexcept
 	}
 }
 
-void SpriteManager::createSpriteFromFrame(const glm::ivec4& frame, const glm::vec2& ratio, std::vector<Sprite2D>& sprites, std::uint32_t texture) noexcept
+void SpriteManager::createSpriteFromFrame(const glm::ivec4& frame, const glm::vec2& ratio, std::vector<Sprite2D>& sprites, unsigned texture) noexcept
 {
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 	m_vertexBuffer.emplace_back();
 
-	auto number    = static_cast<std::uint32_t>(m_vertexBuffer.size() - 4);
+	auto number    = static_cast<unsigned>(m_vertexBuffer.size() - 4);
 	auto& sprite   = sprites.emplace_back();
 	sprite.frame   = number; // offset to first vertex of the quad
 	sprite.texture = texture;
-	sprite.width   = static_cast<std::uint32_t>(frame.z);
-	sprite.height  = static_cast<std::uint32_t>(frame.w);
+	sprite.width   = static_cast<unsigned>(frame.z);
+	sprite.height  = static_cast<unsigned>(frame.w);
 
 	Vertex2D* quad     = &m_vertexBuffer[number];
 	quad[1].position.x = static_cast<float>(frame.z);

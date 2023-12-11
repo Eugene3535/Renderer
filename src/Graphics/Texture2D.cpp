@@ -1,3 +1,5 @@
+#include <glad/glad.h>
+
 #include "graphics/Texture2D.hpp"
 
 Texture2D::Texture2D() noexcept:
@@ -27,14 +29,16 @@ bool Texture2D::loadFromImage(const Image& image) noexcept
         return false;
 
     m_size = image.getSize();
-    const GLsizei width  = static_cast<GLsizei>(m_size.x);
-    const GLsizei height = static_cast<GLsizei>(m_size.y);
+    const int width  = static_cast<int>(m_size.x);
+    const int height = static_cast<int>(m_size.y);
 
 	glGenTextures(1, &m_texture);
     Texture2D::bind(this);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image.getPixels());
 	glGenerateMipmap(GL_TEXTURE_2D);
     Texture2D::bind(nullptr);
+
+    return true;
 }
 
 void Texture2D::setSmooth(bool smooth) noexcept
@@ -95,7 +99,7 @@ bool Texture2D::isRepeated() const noexcept
     return m_isRepeated;
 }
 
-GLuint Texture2D::getNativeHandle() const noexcept
+unsigned Texture2D::getNativeHandle() const noexcept
 {
     return m_texture;
 }

@@ -6,8 +6,6 @@
 #include <unordered_map>
 #include <type_traits>
 
-#include <glad/glad.h>
-
 #include <glm/glm.hpp>
 
 #include "system/NonCopyable.hpp"
@@ -25,27 +23,27 @@ public:
 	~SpriteManager();
 
 	bool createFrame(const std::string& name, const class Texture2D* texture, const glm::ivec4& frame) noexcept;
-	bool createLinearAnimaton(const std::string& name, const class Texture2D* texture, std::int32_t duration, std::int32_t delay) noexcept;
-	bool createGridAnimaton(const std::string& name, const class Texture2D* texture, std::int32_t columns, std::int32_t rows, std::int32_t delay) noexcept;
+	bool createLinearAnimaton(const std::string& name, const class Texture2D* texture, int duration, int delay) noexcept;
+	bool createGridAnimaton(const std::string& name, const class Texture2D* texture, int columns, int rows, int delay) noexcept;
 	bool loadSpriteSheet(const std::string& filename, const class Texture2D* texture) noexcept;
 
 	template<class T>
-	const T get(const std::string& name) const noexcept
+	const T* get(const std::string& name) const noexcept
 	{
 		if constexpr (std::is_same<T, Animation>::value)
 		{
 			auto found = m_animations.find(name);
 			
-			return (found != m_animations.end()) ? found->second : Animation();
+			return (found != m_animations.end()) ? &found->second : nullptr;
 		}
 		else if constexpr (std::is_same<T, std::unordered_map<std::string, Animation>>::value)
 		{
 			auto found = m_spriteSheets.find(name);
 
-			return (found != m_spriteSheets.end()) ? found->second : {};
+			return (found != m_spriteSheets.end()) ? &found->second : nullptr;
 		}
 
-		return {};
+		return nullptr;
 	}
 
 	void unloadOnGPU() noexcept;
@@ -63,8 +61,8 @@ private:
 	std::vector<Vertex2D>            m_vertexBuffer;
 	std::list<std::vector<Sprite2D>> m_sprites;
 
-	GLuint m_vao;
-	GLuint m_vbo;
+	unsigned m_vao;
+	unsigned m_vbo;
 };
 
 #endif

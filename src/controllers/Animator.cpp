@@ -1,4 +1,5 @@
 #include "graphics/Texture2D.hpp"
+#include "graphics/Sprite2D.hpp"
 #include "controllers/Animator.hpp"
 
 Animator::Animator() noexcept:
@@ -36,7 +37,7 @@ bool Animator::setAnimation(const std::string &name) noexcept
     return false;
 }
 
-void Animator::update(std::int32_t dt) noexcept
+void Animator::update(int dt) noexcept
 {
     bool needToPlay = (m_status.isPlaying && ( ! m_status.isOver ));
 

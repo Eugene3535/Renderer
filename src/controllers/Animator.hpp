@@ -15,7 +15,7 @@ public:
 		bool isLooped     = false;
 		bool isOver       = false;
 		bool isReversed   = false;
-	} status;
+	};
 
 public:
 	Animator() noexcept;
@@ -24,12 +24,12 @@ public:
 	bool addAnimation(const std::string& name, const Animation& anim) noexcept;
 	bool setAnimation(const std::string& name) noexcept;
 
-	void update(std::int32_t dt) noexcept;
-	void stop()                  noexcept;
-	void play()                  noexcept;
-	void loop(bool l)            noexcept;
-	void restart()               noexcept;
-	void reverse(bool r)         noexcept;
+	void update(int dt)  noexcept;
+	void stop()          noexcept;
+	void play()          noexcept;
+	void loop(bool l)    noexcept;
+	void restart()       noexcept;
+	void reverse(bool r) noexcept;
 
 	const Sprite2D*  getCurrentFrame() const noexcept;
 	const Animation* getAnimation()    const noexcept;
@@ -38,9 +38,9 @@ public:
 private:
 	std::unordered_map<std::string, Animation> m_animations;
 
-	Animation    m_currentAnimation;
-	std::int32_t m_currentFrame;
-	std::int32_t m_timer;
+	Animation m_currentAnimation;
+	int m_currentFrame;
+	int m_timer;
 
 	Status m_status;
 };

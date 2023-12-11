@@ -16,13 +16,13 @@ Color::Color() noexcept:
 
 }
 
-Color::Color(std::uint8_t red, std::uint8_t green, std::uint8_t blue, std::uint8_t alpha) noexcept:
+Color::Color(unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha) noexcept:
     r(red), g(green), b(blue), a(alpha)
 {
 
 }
 
-Color::Color(std::uint32_t value) noexcept:
+Color::Color(unsigned value) noexcept:
     r((value & 0xff000000) >> 24),
     g((value & 0x00ff0000) >> 16),
     b((value & 0x0000ff00) >> 8 ),
@@ -31,12 +31,12 @@ Color::Color(std::uint32_t value) noexcept:
 
 }
 
-void Color::fromInteger(std::uint32_t value) noexcept
+void Color::fromInteger(unsigned value) noexcept
 {
     *this = Color(value);
 }
 
-std::uint32_t Color::toInteger() const noexcept
+unsigned Color::toInteger() const noexcept
 {
     return (r << 24) | (g << 16) | (b << 8) | a;
 }

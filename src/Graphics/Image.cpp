@@ -19,14 +19,14 @@ Image::~Image()
 {
 }
 
-bool Image::create(std::uint32_t width, std::uint32_t height, const Color& color) noexcept
+bool Image::create(unsigned width, unsigned height, const Color& color) noexcept
 {
     if (width && height)
     {
-        std::vector<std::uint8_t> newPixels(width * height * 4);
+        std::vector<unsigned char> newPixels(width * height * 4);
     
-        std::uint8_t* ptr = &newPixels[0];
-        std::uint8_t* end = ptr + newPixels.size();
+        unsigned char* ptr = &newPixels[0];
+        unsigned char* end = ptr + newPixels.size();
 
         while (ptr < end)
         {
@@ -45,7 +45,7 @@ bool Image::create(std::uint32_t width, std::uint32_t height, const Color& color
     }
 
 //  Dump the pixel buffer
-    std::vector<std::uint8_t>().swap(m_pixels);
+    std::vector<unsigned char>().swap(m_pixels);
     m_size.x = 0;
     m_size.y = 0;
 
@@ -56,15 +56,15 @@ bool Image::loadFromFile(const std::string& filepath) noexcept
 {
     m_pixels.clear();
 
-    std::int32_t width = 0;
-    std::int32_t height = 0;
-    std::int32_t bytePerPixel = 0;
-    glm::uint8_t* data = stbi_load(filepath.c_str(), &width, &height, &bytePerPixel, STBI_rgb_alpha);
+    int width = 0;
+    int height = 0;
+    int bytePerPixel = 0;
+    unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &bytePerPixel, STBI_rgb_alpha);
 
     if (!data)
         return false;
 
-    m_size = { static_cast<std::uint32_t>(width), static_cast<std::uint32_t>(height) };
+    m_size = { static_cast<unsigned>(width), static_cast<unsigned>(height) };
 
     m_pixels.resize(static_cast<size_t>(width * height * 4));
     std::memcpy(&m_pixels[0], data, m_pixels.size());
@@ -87,8 +87,8 @@ bool Image::saveToFile(const std::string& filename) const noexcept
         std::transform(extension.cbegin(), extension.cend(), extension.begin(),
                 [](unsigned char c) { return std::tolower(c); });
 
-        int width  = static_cast<std::int32_t>(m_size.x);
-        int height = static_cast<std::int32_t>(m_size.y);
+        int width  = static_cast<int>(m_size.x);
+        int height = static_cast<int>(m_size.y);
 
         if (extension == "bmp") // BMP
         {
@@ -117,7 +117,7 @@ bool Image::saveToFile(const std::string& filename) const noexcept
     return false;
 }
 
-const std::uint8_t* Image::getPixels() const noexcept
+const unsigned char* Image::getPixels() const noexcept
 {
     return m_pixels.data();
 }

@@ -1,3 +1,5 @@
+#include <glad/glad.h>
+
 #include <iostream>
 #include <cstdio>
 
@@ -16,7 +18,7 @@ Shader::~Shader()
         glDeleteProgram(m_program);
 }
 
-bool Shader::compile(const std::string &filename, GLuint type) noexcept
+bool Shader::compile(const std::string& filename, unsigned type) noexcept
 {
     if(!m_program)
         return false;
@@ -31,7 +33,7 @@ bool Shader::compile(const std::string &filename, GLuint type) noexcept
     if(source.empty())
         return false;
 
-    GLuint shader = compileShaderFromSource(source, type);
+    unsigned shader = compileShaderFromSource(source, type);
 
     if(!shader)
         return false;
@@ -49,7 +51,7 @@ bool Shader::compile(const std::string &vert, const std::string &frag, const std
     return compile(vert, GL_VERTEX_SHADER) && compile(frag, GL_FRAGMENT_SHADER) && compile(geom, GL_GEOMETRY_SHADER);
 }
 
-GLint Shader::getUniformLocation(const char* name) const noexcept
+int Shader::getUniformLocation(const char* name) const noexcept
 {
     if(!m_program)
         return -1;
@@ -90,15 +92,15 @@ std::string Shader::readShaderSourceFromFile(const std::string& filepath)
     return source;
 }
 
-GLuint Shader::compileShaderFromSource(const std::string& source, GLuint type)
+unsigned Shader::compileShaderFromSource(const std::string& source, unsigned type)
 {
-    GLuint shader = glCreateShader(type);
+    unsigned shader = glCreateShader(type);
     const char* c_str = source.c_str();
 
     glShaderSource(shader, 1, &c_str, 0);
     glCompileShader(shader);
 
-    GLint success = 0;
+    int success = 0;
     
     glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
@@ -117,7 +119,7 @@ GLuint Shader::compileShaderFromSource(const std::string& source, GLuint type)
     return shader;
 }
 
-bool Shader::linkToProgram(GLuint shader)
+bool Shader::linkToProgram(unsigned shader)
 {
     glAttachShader(m_program, shader);
     glLinkProgram(m_program); 

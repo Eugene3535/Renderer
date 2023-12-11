@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include <glad/glad.h>
-
 #include "system/NonCopyable.hpp"
 
 class Shader:
@@ -14,20 +12,20 @@ public:
     Shader() noexcept;
     ~Shader();
     
-    bool compile(const std::string& filename, GLuint type) noexcept;
+    bool compile(const std::string& filename, unsigned type) noexcept;
     bool compile(const std::string& filenameVert, const std::string& filenameFrag) noexcept;
     bool compile(const std::string& filenameVert, const std::string& filenameFrag, const std::string& filenameGeom) noexcept;
 
-    GLint getUniformLocation(const char* name) const noexcept;
+    int getUniformLocation(const char* name) const noexcept;
 
     static void bind(const Shader* shader) noexcept;
 
 private:
     std::string readShaderSourceFromFile(const std::string& filename);
-    GLuint      compileShaderFromSource(const std::string& source, GLuint type);
-    bool        linkToProgram(GLuint shader);
+    unsigned    compileShaderFromSource(const std::string& source, unsigned type);
+    bool        linkToProgram(unsigned shader);
 
 private:
-    GLuint m_program;
+    unsigned m_program;
 };
 #endif

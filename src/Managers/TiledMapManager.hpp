@@ -18,10 +18,10 @@ private:
 	struct TilesetData
 	{
 		class Texture2D* texture  = nullptr;
-		std::int32_t     columns   = 0;
-		std::int32_t     rows      = 0;
-		std::int32_t     tileCount = 0;
-		std::int32_t     firstGID  = 1;
+		int columns   = 0;
+		int rows      = 0;
+		int tileCount = 0;
+		int firstGID  = 1;
 	};
 
 public:
@@ -39,7 +39,7 @@ private:
 
 private:
 	std::vector<TilesetData>  parseTilesets(const rapidxml::xml_node<char>* mapNode)   noexcept;
-	std::vector<std::int32_t> parseCSVstring(const rapidxml::xml_node<char>* dataNode) noexcept;
+	std::vector<int> parseCSVstring(const rapidxml::xml_node<char>* dataNode) noexcept;
 
 	void unloadOnGPU(const std::vector<Vertex2D>& vertices, const std::vector<std::uint32_t>& indices) noexcept;
 

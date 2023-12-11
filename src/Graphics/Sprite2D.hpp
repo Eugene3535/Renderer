@@ -1,14 +1,12 @@
 #ifndef SPRITE2D_HPP
 #define SPRITE2D_HPP
 
-#include <cstdint>
-
 struct Sprite2D
 {
-	std::uint32_t texture = 0u;
-	std::uint32_t frame   = 0u;
-	std::uint32_t width   = 0u;
-	std::uint32_t height  = 0u;
+	unsigned texture = 0U;
+	unsigned frame   = 0U;
+	unsigned width   = 0U;
+	unsigned height  = 0U;
 };
 
 bool operator == (const Sprite2D& a, const Sprite2D& b) noexcept;

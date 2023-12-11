@@ -1,8 +1,6 @@
 #ifndef TEXTURE2D_HPP
 #define TEXTURE2D_HPP
 
-#include <glad/glad.h>
-
 #include "system/NonCopyable.hpp"
 #include "graphics/Image.hpp"
 
@@ -22,14 +20,14 @@ public:
 	bool isSmooth()   const noexcept;
 	bool isRepeated() const noexcept;
 
-	GLuint getNativeHandle()    const noexcept;
+	unsigned getNativeHandle()    const noexcept;
 	const glm::uvec2& getSize() const noexcept;
 
 	static void bind(const Texture2D* texture) noexcept;
 
 private:
 	glm::uvec2 m_size;
-	GLuint     m_texture;
+	unsigned   m_texture;
 
 	bool m_isSmooth;
 	bool m_isRepeated;

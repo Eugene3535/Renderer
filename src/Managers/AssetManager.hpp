@@ -23,24 +23,24 @@ public:
     template <class T, class... Args>
     static T* get(const std::string& filename, Args&& ...args) noexcept
     {
-        if( ! m_instance )
-            return nullptr;
-
-//      Textures
-        if constexpr (std::is_same<T, Texture2D>::value)
+        if(m_instance)
         {
-            if(auto it = m_instance->m_textures.find(filename); it != m_instance->m_textures.end())
-                return &it->second;
+//          Textures
+            if constexpr (std::is_same<T, Texture2D>::value)
+            {
+                if(auto it = m_instance->m_textures.find(filename); it != m_instance->m_textures.end())
+                    return &it->second;
 
-            return tryLoadFromFile<Texture2D>(filename, m_instance->m_textures);
-        }
-        //      Shaders
-        else if constexpr (std::is_same<T, Shader>::value)
-        {
-            if(auto it = m_instance->m_shaders.find(filename); it != m_instance->m_shaders.end())
-                return &it->second;
+                return tryLoadFromFile<Texture2D>(filename, m_instance->m_textures);
+            }
+//          Shaders
+            else if constexpr (std::is_same<T, Shader>::value)
+            {
+                if(auto it = m_instance->m_shaders.find(filename); it != m_instance->m_shaders.end())
+                    return &it->second;
 
-            return tryLoadFromFile<Shader>(filename, m_instance->m_shaders, std::forward<Args>(args)...);
+                return tryLoadFromFile<Shader>(filename, m_instance->m_shaders, std::forward<Args>(args)...);
+            }
         }
 
         return nullptr;
@@ -58,7 +58,7 @@ public:
             if(auto it = m_instance->m_textures.find(filename); it != m_instance->m_textures.end())
                 m_instance->m_textures.erase(it);
         }
-        //      Shaders
+//      Shaders
         else if constexpr (std::is_same<T, Shader>::value)
         {
             if(auto it = m_instance->m_shaders.find(filename); it != m_instance->m_shaders.end())

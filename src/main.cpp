@@ -20,6 +20,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 bool IsKeyPressed(GLFWwindow* window, const int key);
 
+glm::mat4* ProjMatrix;
+
 glm::ivec2 screen_size = glm::ivec2(800, 600);
 
 int main()
@@ -83,8 +85,8 @@ int main()
     if(!tmp)
         return -1;
 
-    if( ! anim.addAnimation("Explosion", sm.get<Animation>("Explosion"))) return -1;
-    if( ! anim.setAnimation("Explosion"))return -1;
+    if( ! anim.addAnimation("Explosion", *sm.get<Animation>("Explosion"))) return -1;
+    if( ! anim.setAnimation("Explosion")) return -1;
     anim.loop(true);
     anim.reverse(true);
     anim.play();
@@ -95,6 +97,7 @@ int main()
     int ViewProjection = tilemapShader->getUniformLocation("ViewProjection");
 
     glm::mat4 projection = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, -1.0f, 1.0f);
+    ProjMatrix = &projection;
     Transform2D view;
 
     glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view.getMatrix()));
@@ -187,4 +190,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     screen_size = glm::ivec2(width, height);
     glViewport(0, 0, width, height);
+
+    if(ProjMatrix)
+        *ProjMatrix = glm::ortho(0.0f, (float)screen_size.x, (float)screen_size.y, 0.0f, -1.0f, 1.0f);
 }

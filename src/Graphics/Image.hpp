@@ -1,7 +1,6 @@
 #ifndef IMAGE_HPP
 #define IMAGE_HPP
 
-#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -15,12 +14,12 @@ public:
     Image() noexcept;
     ~Image();
 
-    bool create(std::uint32_t width, std::uint32_t height, const Color& color) noexcept;
+    bool create(unsigned width, unsigned height, const Color& color) noexcept;
     bool loadFromFile(const std::string& filepath) noexcept;
     bool saveToFile(const std::string& filepath) const noexcept;
 
-    const std::uint8_t* getPixels() const noexcept;
-    const glm::uvec2&   getSize()   const noexcept;
+    const unsigned char* getPixels() const noexcept;
+    const glm::uvec2&    getSize()   const noexcept;
 
 private:
     std::vector<std::uint8_t> m_pixels;
