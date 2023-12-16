@@ -109,7 +109,7 @@ bool SpriteManager::loadSpriteSheet(const std::string& filename, const Texture2D
 	if(auto found = m_spriteSheets.find(filename); found != m_spriteSheets.end())
 		return true; // Already loaded
 
-	const std::string filepath = FileProvider::getPathToFile(filename);
+	const std::string filepath = FileProvider().getPathToFile(filename);
 
 	if(filepath.empty())
 		return false;

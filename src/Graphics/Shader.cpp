@@ -23,7 +23,7 @@ bool Shader::compile(const std::string& filename, unsigned type) noexcept
     if(!m_program)
         return false;
 
-    const std::string filepath = FileProvider::getPathToFile(filename);
+    const std::string filepath = FileProvider().getPathToFile(filename);
 
     if(filepath.empty())
         return false;

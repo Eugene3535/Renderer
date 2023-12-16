@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -7,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "system/Defines.hpp"
 #include "graphics/Shader.hpp"
 #include "graphics/Transform2D.hpp"
 #include "graphics/Sprite2D.hpp"
@@ -33,19 +32,20 @@ int main()
 
     GLFWwindow* window = glfwCreateWindow(screen_size.x, screen_size.y, "Renderer", nullptr, nullptr);
 
-    if (window == nullptr)
+    if (!window)
     {
-        std::cout << "Failed to create GLFW window\n";
+        CheckExpr(false);
         glfwTerminate();
         return -1;
     }
+    
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSwapInterval(1);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        CheckExpr(false);
         return -1;
     }
 
@@ -68,8 +68,6 @@ int main()
         }, 0 );
 #endif
 
-    std::cout << glGetString(GL_VERSION) << '\n';
-
     AssetManager al;
     SpriteManager sm;
     TiledMapManager tm;
@@ -80,18 +78,19 @@ int main()
     sm.createLinearAnimaton("Explosion", AssetManager::get<Texture2D>("Explosion.png"), 48, 1000 / 30);
     sm.unloadOnGPU();
 
-    auto tmp = tm.loadFromFile("Dune.tmx");
+    auto tmp = tm.loadFromFile("Atreides8.tmx");
 
     if(!tmp)
         return -1;
 
-    if( ! anim.addAnimation("Explosion", *sm.get<Animation>("Explosion"))) return -1;
-    if( ! anim.setAnimation("Explosion")) return -1;
+    CheckExpr(anim.addAnimation("Explosion", *sm.get<Animation>("Explosion")));
+    CheckExpr(anim.setAnimation("Explosion"));
     anim.loop(true);
     anim.reverse(true);
     anim.play();
 
     Shader* tilemapShader = AssetManager::get<Shader>("TileMap", "tilemap.vert", "tilemap.frag");
+    CheckExpr(tilemapShader);
     Shader::bind(tilemapShader);
     
     int ViewProjection = tilemapShader->getUniformLocation("ViewProjection");
@@ -103,6 +102,7 @@ int main()
     glUniformMatrix4fv(ViewProjection, 1, GL_FALSE, glm::value_ptr(projection * view.getMatrix()));
 
     Shader* spriteShader = AssetManager::get<Shader>("SpriteShader", "sprite.vert", "sprite.frag");
+    CheckExpr(spriteShader);
     Shader::bind(spriteShader);
 
     int ModelViewProjectionLoc = spriteShader->getUniformLocation("ModelViewProjection");

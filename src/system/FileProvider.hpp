@@ -5,7 +5,7 @@
 
 struct FileProvider
 {
-    static std::string getPathToFile(const std::string& filename) noexcept;
+    std::string getPathToFile(const std::string& filename) noexcept;
 };
 
 #endif

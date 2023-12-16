@@ -29,7 +29,7 @@ const TiledMap* TiledMapManager::loadFromFile(const std::string& filename) noexc
 	if(loaded)
 		return loaded;
 
-	const std::string filepath = FileProvider::getPathToFile(filename);
+	const std::string filepath = FileProvider().getPathToFile(filename);
 
 	if(filepath.empty())
 		return nullptr;

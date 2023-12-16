@@ -94,7 +94,7 @@ private:
         }
         else // Image, Texture2D...
         {
-            const std::string filepath = FileProvider::getPathToFile(filename);
+            const std::string filepath = FileProvider().getPathToFile(filename);
 
             if (!filepath.empty())
             {

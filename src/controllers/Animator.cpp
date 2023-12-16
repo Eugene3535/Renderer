@@ -18,7 +18,7 @@ bool Animator::addAnimation(const std::string& name, const Animation& anim) noex
     return m_animations.try_emplace(name, anim).second;
 }
 
-bool Animator::setAnimation(const std::string &name) noexcept
+bool Animator::setAnimation(const std::string& name) noexcept
 {
     if(auto found = m_animations.find(name); found != m_animations.end())
     {
